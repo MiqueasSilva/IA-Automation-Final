@@ -80,16 +80,16 @@
     <text x="12" y="102" class="node-desc">• Memoria relacional</text>
   </g>
 
-  <!-- NODO 4: OPENAI IA -->
+  <!-- NODO 4: OLLAMA IA LOCAL -->
   <g transform="translate(570, 120)">
     <rect width="150" height="120" rx="8" fill="#ffffff" stroke="#6366f1" stroke-width="2" filter="url(#card-shadow)"/>
     <circle cx="20" cy="22" r="10" fill="#6366f1"/>
     <text x="20" y="26" class="node-num" text-anchor="middle">4</text>
-    <text x="36" y="26" class="node-title">OpenAI (IA)</text>
-    <text x="12" y="48" class="node-tech" fill="#4f46e5">MOTOR DE RAZONAMIENTO</text>
-    <text x="12" y="70" class="node-desc">• Tasa repuestos y mano obra</text>
-    <text x="12" y="86" class="node-desc">• Estructura JSON Mode</text>
-    <text x="12" y="102" class="node-desc">• Score y monto USD</text>
+    <text x="36" y="26" class="node-title">Ollama IA</text>
+    <text x="12" y="48" class="node-tech" fill="#4f46e5">QWEN2.5:7B (LOCAL)</text>
+    <text x="12" y="70" class="node-desc">• Tasación en JSON Mode</text>
+    <text x="12" y="86" class="node-desc">• 100% Privado y Costo $0</text>
+    <text x="12" y="102" class="node-desc">• Score y monto en USD</text>
   </g>
 
   <!-- NODO 5: BIFURCACIÓN HITL -->

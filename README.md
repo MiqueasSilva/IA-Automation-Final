@@ -3,7 +3,7 @@
 
 [![n8n](https://img.shields.io/badge/Orquestador-n8n-EA4B71?style=for-the-badge&logo=n8n&logoColor=white)](https://n8n.io/)
 [![Airtable](https://img.shields.io/badge/Cerebro-Airtable-18BFFF?style=for-the-badge&logo=airtable&logoColor=white)](https://airtable.com/)
-[![OpenAI](https://img.shields.io/badge/Razonamiento-GPT--4o--mini%20(JSON)-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
+[![Ollama](https://img.shields.io/badge/IA%20Local-Ollama%20(qwen2.5%3A7b)-000000?style=for-the-badge&logo=ollama&logoColor=white)](https://ollama.ai/)
 [![Gmail](https://img.shields.io/badge/Salida-Gmail%20API-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](https://workspace.google.com/)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-MiqueasSilva%2FIA--Automation--Final-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MiqueasSilva/IA-Automation-Final)
 
@@ -58,7 +58,7 @@ flowchart LR
 | :--- | :--- | :--- |
 | **1. Orquestador** | **n8n** | Motor de flujo central, control condicional, pausas asíncronas de aprobación (HITL) y captura de errores. |
 | **2. Base de Datos** | **Airtable** | "El Cerebro": Memoria de cotizaciones, catálogo de maquinaria/repuestos y tabla de auditoría de errores. |
-| **3. Procesamiento IA** | **OpenAI GPT-4o-mini** | Tasación técnica de piezas, cálculo de costo total en USD, calificación de leads y salida estricta en JSON. |
+| **3. Procesamiento IA** | **Ollama (`qwen2.5:7b`) / OpenAI** | Tasación técnica de piezas, cálculo de costo total en USD, calificación de leads y salida estricta en JSON a costo cero y con privacidad local. |
 | **4. Salida Multicanal** | **Gmail + Slack** | Envío de correo formal al cliente final y canal interactivo de validación humana en Slack. |
 
 ---

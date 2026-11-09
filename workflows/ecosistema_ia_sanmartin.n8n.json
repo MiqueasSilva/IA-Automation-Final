@@ -98,29 +98,17 @@
     },
     {
       "parameters": {
-        "model": "gpt-4o-mini",
-        "options": {
-          "temperature": 0.1,
-          "maxTokens": 600,
-          "responseFormat": "json_object"
-        },
-        "messages": {
-          "values": [
-            {
-              "role": "system",
-              "content": "Eres el tasador técnico de Empresa Sanmartín. Analiza el pedido del cliente y devuelve estrictamente un JSON con este formato:\n{\n  \"equipo\": \"nombre del equipo\",\n  \"repuestos_estimados\": [\"item 1\", \"item 2\"],\n  \"monto_total_usd\": 1200,\n  \"score_lead\": 85,\n  \"categoria_lead\": \"VIP o Estándar\",\n  \"requiere_aprobacion\": false,\n  \"propuesta_resumen\": \"texto breve y profesional de la cotización\"\n}\nRegla: Si el monto_total_usd supera 3000, marca requiere_aprobacion: true."
-            },
-            {
-              "role": "user",
-              "content": "=Cliente: {{ $('2. ¿Datos Completos y Válidos?').item.json.body?.nombre_cliente || $('2. ¿Datos Completos y Válidos?').item.json.nombre_cliente }}\nEmail: {{ $('2. ¿Datos Completos y Válidos?').item.json.body?.email_cliente || $('2. ¿Datos Completos y Válidos?').item.json.email_cliente }}\nEquipo: {{ $('2. ¿Datos Completos y Válidos?').item.json.body?.equipo_industrial || $('2. ¿Datos Completos y Válidos?').item.json.equipo_industrial }}\nMensaje de solicitud: \"{{ $('2. ¿Datos Completos y Válidos?').item.json.body?.mensaje || $('2. ¿Datos Completos y Válidos?').item.json.mensaje }}\"\n\nPrecios de referencia disponibles en catálogo:\n{{ JSON.stringify($json) }}"
-            }
-          ]
-        }
+        "method": "POST",
+        "url": "http://ollama:11434/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"qwen2.5:7b\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Eres el tasador técnico de Empresa Sanmartín. Analiza el requerimiento y responde estrictamente un JSON válido con esta estructura:\\n{\\n  \\\"equipo\\\": \\\"nombre del equipo\\\",\\n  \\\"repuestos_estimados\\\": [\\\"item 1\\\", \\\"item 2\\\"],\\n  \\\"monto_total_usd\\\": 4200,\\n  \\\"score_lead\\\": 90,\\n  \\\"categoria_lead\\\": \\\"VIP o Estándar\\\",\\n  \\\"requiere_aprobacion\\\": true,\\n  \\\"propuesta_resumen\\\": \\\"texto breve de la cotización\\\"\\n}\\nRegla: Si el monto_total_usd supera 3000 USD, marca requiere_aprobacion: true.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Cliente: {{ $('2. ¿Datos Completos y Válidos?').item.json.body?.nombre_cliente || $('2. ¿Datos Completos y Válidos?').item.json.nombre_cliente }}. Equipo: {{ $('2. ¿Datos Completos y Válidos?').item.json.body?.equipo_industrial || $('2. ¿Datos Completos y Válidos?').item.json.equipo_industrial }}. Solicitud: {{ $('2. ¿Datos Completos y Válidos?').item.json.body?.mensaje || $('2. ¿Datos Completos y Válidos?').item.json.mensaje }}\"\n    }\n  ],\n  \"stream\": false,\n  \"format\": \"json\"\n}",
+        "options": {}
       },
-      "id": "node-4-openai",
-      "name": "4. OpenAI: Tasación y Scoring con IA",
-      "type": "n8n-nodes-base.openAi",
-      "typeVersion": 1.4,
+      "id": "node-4-ollama",
+      "name": "4. IA: Razonamiento con Ollama (qwen2.5:7b)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         880,
         240
@@ -128,7 +116,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Parsear salida JSON de OpenAI de forma segura\nconst content = $json.message?.content || '{}';\nlet aiData = {};\ntry {\n  aiData = typeof content === 'string' ? JSON.parse(content) : content;\n} catch (e) {\n  aiData = { monto_total_usd: 1500, requiere_aprobacion: false, propuesta_resumen: content };\n}\n\nconst inputData = $('2. ¿Datos Completos y Válidos?').item.json.body || $('2. ¿Datos Completos y Válidos?').item.json;\nconst monto = Number(aiData.monto_total_usd) || 0;\nconst necesitaHitl = monto > 3000 || aiData.requiere_aprobacion === true;\n\nreturn {\n  json: {\n    id_solicitud: 'COT-' + Math.floor(1000 + Math.random() * 9000),\n    nombre_cliente: inputData.nombre_cliente || 'Cliente Industrial',\n    email_cliente: inputData.email_cliente,\n    equipo: aiData.equipo || inputData.equipo_industrial || 'Lavadora de botellas',\n    monto_total_usd: monto,\n    score_lead: aiData.score_lead || 80,\n    categoria_lead: aiData.categoria_lead || 'Estándar',\n    requiere_hitl: necesitaHitl,\n    propuesta_resumen: aiData.propuesta_resumen || 'Cotización formal de repuestos originales Sanmartín.'\n  }\n};"
+        "jsCode": "// Parsear salida JSON de Ollama / LLM de forma segura\nconst content = $json.message?.content || '{}';\nlet aiData = {};\ntry {\n  aiData = typeof content === 'string' ? JSON.parse(content) : content;\n} catch (e) {\n  aiData = { monto_total_usd: 1500, requiere_aprobacion: false, propuesta_resumen: content };\n}\n\nconst inputData = $('2. ¿Datos Completos y Válidos?').item.json.body || $('2. ¿Datos Completos y Válidos?').item.json;\nconst monto = Number(aiData.monto_total_usd) || 0;\nconst necesitaHitl = monto > 3000 || aiData.requiere_aprobacion === true;\n\nreturn {\n  json: {\n    id_solicitud: 'COT-' + Math.floor(1000 + Math.random() * 9000),\n    nombre_cliente: inputData.nombre_cliente || 'Cliente Industrial',\n    email_cliente: inputData.email_cliente,\n    equipo: aiData.equipo || inputData.equipo_industrial || 'Lavadora de botellas',\n    monto_total_usd: monto,\n    score_lead: aiData.score_lead || 80,\n    categoria_lead: aiData.categoria_lead || 'Estándar',\n    requiere_hitl: necesitaHitl,\n    propuesta_resumen: aiData.propuesta_resumen || 'Cotización formal de repuestos originales Sanmartín.'\n  }\n};"
       },
       "id": "node-5-parse-ia",
       "name": "5. Procesar Respuesta IA",
@@ -277,14 +265,14 @@
       "main": [
         [
           {
-            "node": "4. OpenAI: Tasación y Scoring con IA",
+            "node": "4. IA: Razonamiento con Ollama (qwen2.5:7b)",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "4. OpenAI: Tasación y Scoring con IA": {
+    "4. IA: Razonamiento con Ollama (qwen2.5:7b)": {
       "main": [
         [
           {
