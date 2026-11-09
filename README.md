@@ -241,4 +241,4 @@ El guion completo estructurado minuto a minuto para la grabación del video expl
 
 ---
 
-*Proyecto desarrollado para la Diplomatura de IA Automation por Miqueas — Coderhouse (Noviembre 2026).*
+*Proyecto desarrollado para la Diplomatura de IA Automation por Miqueas Silva — Coderhouse (Noviembre 2026).*
