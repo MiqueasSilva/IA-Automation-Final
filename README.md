@@ -182,62 +182,35 @@ Se ejecutó una batería de 5 pruebas exhaustivas cubriendo el camino feliz, apr
 
 ## 📂 8. Estructura de Entregables del Repositorio
 
-```
+```text
 IA Automation/
-├── README.md                                          <- Esta documentación maestra
-├── Entrega_Final_Ecosistema_IA_Sanmartin.pdf         <- Documento PDF oficial de entrega (con diagramas y arquitectura)
+├── README.md                                          <- Documentación técnica del ecosistema
+├── Entrega_Final_Ecosistema_IA_Sanmartin.pdf         <- Documento PDF oficial de entrega (arquitectura y diagramas)
 ├── workflows/
-│   ├── ecosistema_ia_sanmartin.n8n.json              <- Flujo técnico listo para importar en n8n
+│   ├── ecosistema_ia_sanmartin.n8n.json              <- Flujo principal exportado de n8n
 │   └── ecosistema_ia_sanmartin.make_blueprint.json   <- Blueprint alternativo para Make
 ├── database/
 │   ├── airtable_schema_sanmartin.md                  <- Documentación del Cerebro y Relaciones
-│   ├── Solicitudes_Cotizaciones_Template.csv         <- Template para crear la tabla maestra
-│   ├── Catalogo_Maquinaria_Template.csv              <- Template del catálogo de piezas
-│   └── Logs_Auditoria_Errores_Template.csv           <- Template para auditoría de errores
+│   ├── Solicitudes_Cotizaciones_Template.csv         <- Datos y estructura de la tabla maestra
+│   ├── Catalogo_Maquinaria_Template.csv              <- Catálogo relacional de repuestos y equipos
+│   └── Logs_Auditoria_Errores_Template.csv           <- Registro de auditoría y capturas de error
 ├── tests/
-│   ├── stress_test_matrix.md                         <- Análisis detallado de las 5 pruebas de estrés
-│   └── mock_test_payloads.json                       <- Payloads JSON listos para disparar en Postman/cURL
+│   ├── stress_test_matrix.md                         <- Análisis y resultados de las 5 pruebas de estrés
+│   └── mock_test_payloads.json                       <- Payloads de prueba utilizados en Postman/cURL
 ├── docs/
-│   ├── script_video_demo_3min.md                     <- Guion segundo a segundo para el video demo
-│   └── checklist_seguridad_arquitectura.md           <- Certificación de seguridad y resiliencia
+│   └── checklist_seguridad_arquitectura.md           <- Checklist de seguridad y resiliencia
 └── assets/
     └── diagramas/
-        └── arquitectura_ecosistema_sanmartin.svg     <- Diagrama vectorial de arquitectura de alta resolución
+        └── arquitectura_ecosistema_sanmartin.svg     <- Diagrama vectorial de la arquitectura
 ```
 
 ---
 
-## 🚀 9. Guía de Instalación y Despliegue Rápido (3 Pasos)
+## 🎥 9. Video Demostrativo
 
-### Paso 1: Importar el Flujo en n8n
-1. Abre tu instancia de n8n (Cloud o Self-Hosted).
-2. Haz clic en **Workflows** ➔ **Import from File**.
-3. Selecciona el archivo `workflows/ecosistema_ia_sanmartin.n8n.json`.
-4. Vincula tus credenciales de **OpenAI**, **Airtable**, **Slack** y **Gmail**.
+Demostración en video del flujo en vivo (Trigger, procesamiento inteligente con IA, bifurcación HITL en Slack y resultado final en Gmail):
 
-### Paso 2: Configurar Airtable
-1. Crea una base en Airtable denominada `Sanmartin_Ecosistema_IA`.
-2. Importa los 3 archivos CSV ubicados en `/database`:
-   - `Solicitudes_Cotizaciones_Template.csv`
-   - `Catalogo_Maquinaria_Template.csv`
-   - `Logs_Auditoria_Errores_Template.csv`
-3. Configura el campo `Equipo_Industrial` como **Link to another record** hacia `Catalogo_Maquinaria`.
-
-### Paso 3: Probar el Flujo
-1. En n8n, pulsa **Test Step** en el nodo `Trigger: Webhook Nueva Solicitud`.
-2. Envía uno de los payloads de prueba desde `tests/mock_test_payloads.json` mediante Postman o curl:
-   ```bash
-   curl -X POST https://tu-instancia-n8n/webhook/cotizacion-industrial-webhook \
-     -H "Content-Type: application/json" \
-     -d @tests/mock_test_payloads.json
-   ```
-3. Observa la ejecución, la notificación de HITL en Slack y el correo final en Gmail.
-
----
-
-## 🎥 10. Video Demostrativo (3 Minutos)
-El guion completo estructurado minuto a minuto para la grabación del video explicativo se encuentra disponible en:  
-👉 **[Guion del Video Demo (3 min)](docs/script_video_demo_3min.md)**
+> 📹 **Video de Demostración:** [Ver Video en Loom / Drive](https://drive.google.com/your-video-link-here)
 
 ---
 
