@@ -60,8 +60,16 @@
     {
       "parameters": {
         "operation": "append",
-        "base": "appSanmartinBase",
-        "table": "Logs_Auditoria_Errores",
+        "base": {
+          "__rl": true,
+          "value": "Sanmartin_Ecosistema_IA",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "Logs_Auditoria_Errores",
+          "mode": "list"
+        },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
@@ -82,9 +90,17 @@
     },
     {
       "parameters": {
-        "operation": "list",
-        "base": "appSanmartinBase",
-        "table": "Catalogo_Maquinaria_Repuestos",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "Sanmartin_Ecosistema_IA",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "Catalogo_Maquinaria_Repuestos",
+          "mode": "list"
+        },
         "additionalOptions": {}
       },
       "id": "node-3-airtable-context",
@@ -160,38 +176,32 @@
     },
     {
       "parameters": {
-        "channel": "#aprobaciones-cotizaciones",
-        "text": "=⚠️ *ALERTA HITL: Aprobación Requerida para Cotización*\n*ID:* `{{ $json.id_solicitud }}` | *Cliente:* {{ $json.nombre_cliente }}\n*Equipo:* {{ $json.equipo }}\n*Monto Total:* *${{ $json.monto_total_usd }} USD* (Supera umbral de seguridad)\n*Resumen IA:* {{ $json.propuesta_resumen }}\n\n👉 Para aprobar haz clic en: http://localhost:5678/webhook/hitl-aprobado?id={{ $json.id_solicitud }}"
-      },
-      "id": "node-hitl-slack",
-      "name": "HITL: Solicitar Aprobación en Slack",
-      "type": "n8n-nodes-base.slack",
-      "typeVersion": 2.1,
-      "position": [
-        1540,
-        120
-      ]
-    },
-    {
-      "parameters": {
         "resume": "webhook",
         "webhookSuffix": "=hitl-aprobado"
       },
       "id": "node-hitl-wait",
-      "name": "HITL: Esperar Decisión Humana (Wait)",
+      "name": "HITL: Pausar hasta Aprobación Humana (Wait)",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1760,
-        120
+        1600,
+        140
       ],
       "webhookId": "hitl-approval-simple"
     },
     {
       "parameters": {
         "operation": "append",
-        "base": "appSanmartinBase",
-        "table": "Solicitudes_Cotizaciones",
+        "base": {
+          "__rl": true,
+          "value": "Sanmartin_Ecosistema_IA",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "Solicitudes_Cotizaciones",
+          "mode": "list"
+        },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
@@ -210,7 +220,7 @@
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2,
       "position": [
-        2000,
+        1900,
         240
       ]
     },
@@ -226,7 +236,7 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        2240,
+        2150,
         240
       ]
     }
@@ -298,7 +308,7 @@
       "main": [
         [
           {
-            "node": "HITL: Solicitar Aprobación en Slack",
+            "node": "HITL: Pausar hasta Aprobación Humana (Wait)",
             "type": "main",
             "index": 0
           }
@@ -312,18 +322,7 @@
         ]
       ]
     },
-    "HITL: Solicitar Aprobación en Slack": {
-      "main": [
-        [
-          {
-            "node": "HITL: Esperar Decisión Humana (Wait)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HITL: Esperar Decisión Humana (Wait)": {
+    "HITL: Pausar hasta Aprobación Humana (Wait)": {
       "main": [
         [
           {

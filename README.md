@@ -1,5 +1,5 @@
 # 🏭 Ecosistema Autónomo de Cotizaciones Industriales con IA
-### Flujo Integral con n8n, Airtable, OpenAI y Salida Multicanal (Gmail / Slack)
+### Flujo Integral con n8n, Airtable, Ollama y Salida por Gmail
 
 [![n8n](https://img.shields.io/badge/Orquestador-n8n-EA4B71?style=for-the-badge&logo=n8n&logoColor=white)](https://n8n.io/)
 [![Airtable](https://img.shields.io/badge/Cerebro-Airtable-18BFFF?style=for-the-badge&logo=airtable&logoColor=white)](https://airtable.com/)
@@ -18,8 +18,8 @@ Este ecosistema atiende solicitudes técnicas y de cotización de clientes indus
 1. **Recibe** la solicitud mediante Webhook o formulario.
 2. **Valida** los datos de entrada (email con formato válido y mensaje técnico no vacío). Si faltan datos, desvía a la **Ruta de Error** en Airtable.
 3. **Consulta** el catálogo de precios y repuestos de la maquinaria en **Airtable** (El Cerebro).
-4. **Procesa y Tasa** la cotización con **OpenAI (GPT-4o-mini)** en formato JSON estructurado, calculando el costo total en USD y el Lead Score.
-5. **Control Human-in-the-Loop (HITL):** Si el monto supera los **$3,000 USD**, el flujo se pausa en un nodo *Wait* y solicita aprobación en **Slack** antes de contactar al cliente, previniendo el "efecto metralleta".
+4. **Procesa y Tasa** la cotización con **Ollama local (qwen2.5:7b)** en formato JSON estructurado sobre la GPU NVIDIA RTX 4060, calculando el costo total en USD y el Lead Score.
+5. **Control Human-in-the-Loop (HITL):** Si el monto supera los **$3,000 USD**, el flujo se detiene en un nodo de espera **Wait**, previniendo el "efecto metralleta" hasta recibir la confirmación humana.
 6. **Entrega:** Actualiza el estado en Airtable y despacha la propuesta comercial formal vía **Gmail**.
 
 ---
@@ -31,23 +31,22 @@ flowchart LR
     A["1. Webhook Inbound"] --> B{"2. ¿Datos Válidos?"}
     B -- "❌ Faltan Datos" --> ERR["🚨 Ruta Error:<br/>Airtable Logs"]
     B -- "✅ OK" --> C["3. Airtable:<br/>Catálogo Precios"]
-    C --> D["4. OpenAI IA:<br/>Tasación en JSON"]
+    C --> D["4. Ollama IA:<br/>Tasación en JSON"]
     D --> E{"5. ¿Monto > $3000 USD?"}
-    E -- "⚠️ SÍ (HITL)" --> SLK["🔔 Slack:<br/>Pedir Aprobación"]
-    SLK --> WAIT["⏸️ Wait Node:<br/>Espera Decisión"]
+    E -- "⚠️ SÍ (HITL)" --> WAIT["⏸️ Wait Node:<br/>Pausa hasta Aprobación"]
     WAIT --> F["6. Airtable:<br/>Guardar Estado"]
     E -- "✅ NO (Auto)" --> F
     F --> G["7. Gmail:<br/>Enviar Cotización"]
 
     classDef ok fill:#ecfdf5,stroke:#10b981,stroke-width:2px;
-    classDef err fill:#fef2f2,stroke:#ef4444,stroke-width:2px;
+    classDef err fill:#fffbeb,stroke:#ef4444,stroke-width:2px;
     classDef hitl fill:#fffbeb,stroke:#f59e0b,stroke-width:2px;
     classDef main fill:#eff6ff,stroke:#3b82f6,stroke-width:2px;
 
     class A,C,D,F main;
     class B,E,G ok;
     class ERR err;
-    class SLK,WAIT hitl;
+    class WAIT hitl;
 ```
 
 ---
@@ -59,7 +58,7 @@ flowchart LR
 | **1. Orquestador** | **n8n** | Motor de flujo central, control condicional, pausas asíncronas de aprobación (HITL) y captura de errores. |
 | **2. Base de Datos** | **Airtable** | "El Cerebro": Memoria de cotizaciones, catálogo de maquinaria/repuestos y tabla de auditoría de errores. |
 | **3. Procesamiento IA** | **Ollama (`qwen2.5:7b`) / OpenAI** | Tasación técnica de piezas, cálculo de costo total en USD, calificación de leads y salida estricta en JSON a costo cero y con privacidad local. |
-| **4. Salida Multicanal** | **Gmail + Slack** | Envío de correo formal al cliente final y canal interactivo de validación humana en Slack. |
+| **4. Canal de Salida** | **Gmail API** | Envío de correo formal al cliente final con la propuesta comercial validada. |
 
 ---
 
@@ -80,10 +79,9 @@ El sistema utiliza 3 tablas conectadas:
 ## 🛑 5. Punto de Control Human-in-the-Loop (HITL)
 
 Para evitar enviar ofertas automáticas desmedidas a clientes industriales:
-- Si el presupuesto calculado por la IA es **mayor a $3,000 USD**, se activa el nodo **Wait (Webhook)** en n8n.
-- Se envía un mensaje al canal de Slack `#aprobaciones-cotizaciones`.
-- El flujo permanece en pausa reactiva hasta que el responsable comercial hace clic en el enlace de aprobación.
-- Una vez aprobado, el flujo despierta y despacha el correo vía Gmail.
+- Si el presupuesto calculado por la IA es **mayor a $3,000 USD**, se activa el nodo de espera **Wait (Webhook)** en n8n.
+- El flujo suspende la ejecución evitando el "efecto metralleta" y espera la confirmación humana.
+- Una vez recibido el feedback de aprobación, el flujo despierta y despacha el correo vía Gmail.
 
 ---
 
@@ -92,7 +90,7 @@ Para evitar enviar ofertas automáticas desmedidas a clientes industriales:
 | Caso | Escenario | Entrada | Comportamiento | Estado en DB |
 | :---: | :--- | :--- | :--- | :--- |
 | **TEST-01** | **Camino Feliz Estándar** | Repuesto menor ($750 USD) | Monto &lt; 3000 USD. Salta HITL y envía correo directo. | `Auto-Aprobado` |
-| **TEST-02** | **Camino Feliz con HITL** | Bomba de enjuague ($4,400 USD) | Supera $3,000 USD. Pausa en Slack. Se aprueba y envía correo. | `Aprobado por Humano` |
+| **TEST-02** | **Camino Feliz con HITL** | Bomba de enjuague ($4,400 USD) | Supera $3,000 USD. Pausa en espera humana. Se aprueba y envía correo. | `Aprobado por Humano` |
 | **TEST-03** | **Camino Infeliz (Error)** | Email sin @ o mensaje vacío | Router de validación desvía a rama de error. **Aborta IA**. | `Error Validación` |
 
 ---
@@ -134,7 +132,7 @@ IA Automation/
 
 ## 🎥 9. Video Demostrativo
 
-Demostración en video del flujo en funcionamiento en vivo (Trigger, procesamiento con IA, bifurcación HITL en Slack y envío de cotización):
+Demostración en video del flujo en funcionamiento en vivo (Trigger, procesamiento con IA, bifurcación HITL y envío de cotización):
 
 > 📹 **Video Demo:** [Ver Video en Loom / Drive](https://drive.google.com/your-video-link-here)
 
