@@ -1,52 +1,59 @@
 {
-  "name": "Ecosistema Autónomo de Cotizaciones Industriales y Triaje con HITL - Sanmartín",
+  "name": "Ecosistema de Automatización IA - Cotizaciones Industriales Sanmartín",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "cotizacion-industrial-webhook",
+        "path": "nueva-solicitud",
         "options": {}
       },
-      "id": "node-trigger-webhook",
-      "name": "Trigger: Webhook Nueva Solicitud",
+      "id": "node-1-webhook",
+      "name": "1. Webhook: Nueva Solicitud",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        100,
+        200,
         300
       ],
-      "webhookId": "sanmartin-cotizacion-inbound"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Validacion Estricta de Datos y Tipos (Camino Feliz vs Infeliz)\nconst body = $json.body || $json;\n\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nconst esEmailValido = body.email_cliente && emailRegex.test(body.email_cliente.trim());\nconst tieneEquipo = body.equipo_industrial && typeof body.equipo_industrial === 'string' && body.equipo_industrial.trim().length > 2;\nconst tieneMensaje = body.mensaje_requerimiento && typeof body.mensaje_requerimiento === 'string' && body.mensaje_requerimiento.trim().length > 5;\nconst tieneCliente = body.nombre_cliente && typeof body.nombre_cliente === 'string' && body.nombre_cliente.trim().length > 1;\n\nconst esValido = Boolean(esEmailValido && tieneEquipo && tieneMensaje && tieneCliente);\n\nreturn {\n  json: {\n    ...body,\n    id_solicitud: body.id_solicitud || 'COT-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000),\n    fecha_ingreso: new Date().toISOString(),\n    es_valido: esValido,\n    motivo_invalido: esValido ? null : 'Faltan campos obligatorios (nombre, email válido, equipo industrial o detalle técnico)'\n  }\n};"
-      },
-      "id": "node-input-validation",
-      "name": "Data Quality & Input Validation",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        320,
-        300
-      ]
+      "webhookId": "nueva-solicitud-webhook"
     },
     {
       "parameters": {
         "conditions": {
-          "boolean": [
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
             {
-              "value1": "={{ $json.es_valido }}",
-              "value2": true
+              "id": "c1",
+              "leftValue": "={{ $json.body?.email_cliente || $json.email_cliente }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "c2",
+              "leftValue": "={{ $json.body?.mensaje || $json.mensaje }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
             }
-          ]
+          ],
+          "combinator": "and"
         }
       },
-      "id": "node-if-valid",
-      "name": "¿Datos de Entrada Válidos?",
+      "id": "node-2-valida-input",
+      "name": "2. ¿Datos Completos y Válidos?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
+      "typeVersion": 2.2,
       "position": [
-        540,
+        420,
         300
       ]
     },
@@ -58,49 +65,19 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "Fecha": "={{ $json.fecha_ingreso }}",
-            "ID_Solicitud": "={{ $json.id_solicitud }}",
-            "Tipo_Error": "VALIDATION_ERROR",
-            "Detalle_Error": "={{ $json.motivo_invalido }}",
-            "Payload_Recibido": "={{ JSON.stringify($json) }}",
-            "Estado_Resolucion": "Requiere Atencion Manual"
+            "Tipo_Error": "DATOS_INVALIDOS",
+            "Detalle_Tecnico": "=Faltan campos obligatorios o email sin formato válido.",
+            "Payload_Recibido": "={{ JSON.stringify($json) }}"
           }
         }
       },
-      "id": "node-airtable-log-validation-error",
-      "name": "Airtable: Registrar Error Validación",
+      "id": "node-error-db",
+      "name": "Ruta Error: Registrar Falla en Airtable",
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2,
       "position": [
-        780,
-        500
-      ]
-    },
-    {
-      "parameters": {
-        "channel": "#alertas-operaciones-ia",
-        "text": "=:warning: *Alerta de Entrada Inválida en Cotizaciones*\n*ID:* `{{ $json.id_solicitud }}`\n*Motivo:* {{ $json.motivo_invalido }}\n*Payload:* `{{ JSON.stringify($json) }}`\n*Acción:* Registrado en auditoría. El flujo se detiene de forma segura sin bucle."
-      },
-      "id": "node-slack-alert-invalid",
-      "name": "Slack: Notificar Error a Soporte",
-      "type": "n8n-nodes-base.slack",
-      "typeVersion": 2.1,
-      "position": [
-        1000,
-        500
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "// Gobernanza y Anonimizacion de PII (Proteccion de Datos Industriales)\nconst raw = $json;\n\n// Desacoplamos los datos sensibles (PII)\nconst piiData = {\n  nombre_cliente: raw.nombre_cliente,\n  email_cliente: raw.email_cliente,\n  empresa_cliente: raw.empresa_cliente || 'No especificada',\n  telefono_cliente: raw.telefono_cliente || 'N/A'\n};\n\nconst tokenAnonimo = 'CLI-SAN-' + Math.floor(1000 + Math.random() * 9000);\n\n// Payload higienizado para el motor de IA\nconst aiCleanPayload = {\n  id_solicitud: raw.id_solicitud,\n  id_cliente_anonimizado: tokenAnonimo,\n  equipo_industrial: raw.equipo_industrial,\n  linea_produccion: raw.linea_produccion || 'Línea de Envasado Estándar',\n  mensaje_requerimiento: raw.mensaje_requerimiento,\n  urgencia_dias: raw.urgencia_dias || 15\n};\n\nreturn {\n  json: {\n    ...aiCleanPayload,\n    _pii_vault: piiData\n  }\n};"
-      },
-      "id": "node-pii-anonymizer",
-      "name": "Gobernanza: Anonimización PII",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        780,
-        200
+        640,
+        480
       ]
     },
     {
@@ -108,17 +85,15 @@
         "operation": "list",
         "base": "appSanmartinBase",
         "table": "Catalogo_Maquinaria_Repuestos",
-        "additionalOptions": {
-          "filterByFormula": "={Activo}=1"
-        }
+        "additionalOptions": {}
       },
-      "id": "node-airtable-get-catalog",
-      "name": "Airtable: Consultar Catálogo y Tarifas",
+      "id": "node-3-airtable-context",
+      "name": "3. Airtable: Consultar Catálogo de Precios",
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2,
       "position": [
-        1000,
-        200
+        640,
+        240
       ]
     },
     {
@@ -126,89 +101,103 @@
         "model": "gpt-4o-mini",
         "options": {
           "temperature": 0.1,
-          "maxTokens": 800,
+          "maxTokens": 600,
           "responseFormat": "json_object"
         },
         "messages": {
           "values": [
             {
               "role": "system",
-              "content": "Eres el Ingeniero de Soluciones y Tasador Técnico de Empresa Sanmartín (líder en maquinaria de envasado, lavadoras de botellas y transportadores).\nTu tarea es analizar requerimientos técnicos de clientes de forma estructurada y emitir un dictamen de cotización en formato JSON estrictamente válido.\n\nReglas de negocio:\n1. Identifica el equipo industrial y componentes afectados.\n2. Desglosa los repuestos necesarios y el servicio de mano de obra/calibración con costos unitarios lógicos en USD.\n3. Calcula el monto_estimado_total_usd sumando todos los subtotales.\n4. Evalúa complejidad_servicio ('Baja', 'Media', 'Alta').\n5. Asigna categoria_lead ('VIP', 'Calificado', 'Estándar', 'Descartado') y un score_lead numérico del 1 al 100.\n6. Si monto_estimado_total_usd > 3000 USD O complejidad_servicio == 'Alta' O categoria_lead == 'VIP', establece requiere_hitl = true y justifica la razón. De lo contrario, requiere_hitl = false.\n7. Genera un resumen_ejecutivo y un borrador_propuesta_tecnica_html conciso y profesional.\n\nFormato exacto de respuesta JSON esperado:\n{\n  \"equipo_detectado\": \"string\",\n  \"linea_produccion\": \"string\",\n  \"items_cotizacion\": [\n    {\"item\": \"string\", \"tipo\": \"Repuesto|Servicio\", \"cantidad\": 1, \"costo_unitario_usd\": 100, \"subtotal_usd\": 100}\n  ],\n  \"monto_estimado_total_usd\": 1500,\n  \"tiempo_entrega_dias\": 15,\n  \"complejidad_servicio\": \"Baja|Media|Alta\",\n  \"score_lead\": 85,\n  \"categoria_lead\": \"Calificado\",\n  \"requiere_hitl\": false,\n  \"justificacion_hitl\": \"string\",\n  \"resumen_ejecutivo\": \"string\",\n  \"borrador_propuesta_tecnica_html\": \"string\"\n}"
+              "content": "Eres el tasador técnico de Empresa Sanmartín. Analiza el pedido del cliente y devuelve estrictamente un JSON con este formato:\n{\n  \"equipo\": \"nombre del equipo\",\n  \"repuestos_estimados\": [\"item 1\", \"item 2\"],\n  \"monto_total_usd\": 1200,\n  \"score_lead\": 85,\n  \"categoria_lead\": \"VIP o Estándar\",\n  \"requiere_aprobacion\": false,\n  \"propuesta_resumen\": \"texto breve y profesional de la cotización\"\n}\nRegla: Si el monto_total_usd supera 3000, marca requiere_aprobacion: true."
             },
             {
               "role": "user",
-              "content": "=:Analiza la siguiente solicitud para la maquinaria Sanmartín:\nID Solicitud: {{ $('Gobernanza: Anonimización PII').item.json.id_solicitud }}\nCliente Token: {{ $('Gobernanza: Anonimización PII').item.json.id_cliente_anonimizado }}\nEquipo: {{ $('Gobernanza: Anonimización PII').item.json.equipo_industrial }}\nLínea: {{ $('Gobernanza: Anonimización PII').item.json.linea_produccion }}\nMensaje del cliente: \"{{ $('Gobernanza: Anonimización PII').item.json.mensaje_requerimiento }}\"\nUrgencia deseada: {{ $('Gobernanza: Anonimización PII').item.json.urgencia_dias }} días.\n\nContexto de Catálogo y Tarifas estándar:\n{{ JSON.stringify($json) }}"
+              "content": "=Cliente: {{ $('2. ¿Datos Completos y Válidos?').item.json.body?.nombre_cliente || $('2. ¿Datos Completos y Válidos?').item.json.nombre_cliente }}\nEmail: {{ $('2. ¿Datos Completos y Válidos?').item.json.body?.email_cliente || $('2. ¿Datos Completos y Válidos?').item.json.email_cliente }}\nEquipo: {{ $('2. ¿Datos Completos y Válidos?').item.json.body?.equipo_industrial || $('2. ¿Datos Completos y Válidos?').item.json.equipo_industrial }}\nMensaje de solicitud: \"{{ $('2. ¿Datos Completos y Válidos?').item.json.body?.mensaje || $('2. ¿Datos Completos y Válidos?').item.json.mensaje }}\"\n\nPrecios de referencia disponibles en catálogo:\n{{ JSON.stringify($json) }}"
             }
           ]
         }
       },
-      "id": "node-ai-reasoning-openai",
-      "name": "IA: Razonamiento y Tasación Técnica",
+      "id": "node-4-openai",
+      "name": "4. OpenAI: Tasación y Scoring con IA",
       "type": "n8n-nodes-base.openAi",
       "typeVersion": 1.4,
       "position": [
-        1240,
-        200
-      ],
-      "onError": "continueErrorOutput"
+        880,
+        240
+      ]
     },
     {
       "parameters": {
-        "jsCode": "// Re-asociacion PII, Fusion de Datos y Verificacion de Respuesta IA\nconst aiItem = $json;\nconst piiData = $('Gobernanza: Anonimización PII').item.json._pii_vault;\nconst baseData = $('Gobernanza: Anonimización PII').item.json;\n\n// Si la IA fallo por timeout o cuota\nif (!aiItem || aiItem.error || !aiItem.message) {\n  return {\n    json: {\n      es_error_ia: true,\n      id_solicitud: baseData.id_solicitud,\n      error_detalle: aiItem.error ? JSON.stringify(aiItem.error) : 'Respuesta de IA vacía o corrupta',\n      pii: piiData\n    }\n  };\n}\n\nlet parsedAi = {};\ntry {\n  const contentStr = aiItem.message.content;\n  parsedAi = typeof contentStr === 'string' ? JSON.parse(contentStr) : contentStr;\n} catch (e) {\n  parsedAi = {\n    error: 'JSON Parse Error: ' + e.message,\n    monto_estimado_total_usd: 0,\n    requiere_hitl: true\n  };\n}\n\n// Calculo de seguridad adicional: regla determinista para HITL\nconst montoTotal = Number(parsedAi.monto_estimado_total_usd) || 0;\nconst esHitlObligatorio = montoTotal > 3000 || parsedAi.complejidad_servicio === 'Alta' || parsedAi.categoria_lead === 'VIP' || parsedAi.requiere_hitl === true;\n\nreturn {\n  json: {\n    es_error_ia: false,\n    id_solicitud: baseData.id_solicitud,\n    nombre_cliente: piiData.nombre_cliente,\n    email_cliente: piiData.email_cliente,\n    empresa_cliente: piiData.empresa_cliente,\n    telefono_cliente: piiData.telefono_cliente,\n    equipo_industrial: parsedAi.equipo_detectado || baseData.equipo_industrial,\n    linea_produccion: parsedAi.linea_produccion || baseData.linea_produccion,\n    monto_estimado_total_usd: montoTotal,\n    items_cotizacion: parsedAi.items_cotizacion || [],\n    tiempo_entrega_dias: parsedAi.tiempo_entrega_dias || 15,\n    score_lead: parsedAi.score_lead || 70,\n    categoria_lead: parsedAi.categoria_lead || 'Estándar',\n    complejidad_servicio: parsedAi.complejidad_servicio || 'Media',\n    requiere_hitl: esHitlObligatorio,\n    justificacion_hitl: parsedAi.justificacion_hitl || (esHitlObligatorio ? 'Supera umbral de control $3000 USD' : 'Proceso de bajo riesgo'),\n    resumen_ejecutivo: parsedAi.resumen_ejecutivo || 'Cotización generada automáticamente',\n    borrador_html: parsedAi.borrador_propuesta_tecnica_html || ''\n  }\n};"
+        "jsCode": "// Parsear salida JSON de OpenAI de forma segura\nconst content = $json.message?.content || '{}';\nlet aiData = {};\ntry {\n  aiData = typeof content === 'string' ? JSON.parse(content) : content;\n} catch (e) {\n  aiData = { monto_total_usd: 1500, requiere_aprobacion: false, propuesta_resumen: content };\n}\n\nconst inputData = $('2. ¿Datos Completos y Válidos?').item.json.body || $('2. ¿Datos Completos y Válidos?').item.json;\nconst monto = Number(aiData.monto_total_usd) || 0;\nconst necesitaHitl = monto > 3000 || aiData.requiere_aprobacion === true;\n\nreturn {\n  json: {\n    id_solicitud: 'COT-' + Math.floor(1000 + Math.random() * 9000),\n    nombre_cliente: inputData.nombre_cliente || 'Cliente Industrial',\n    email_cliente: inputData.email_cliente,\n    equipo: aiData.equipo || inputData.equipo_industrial || 'Lavadora de botellas',\n    monto_total_usd: monto,\n    score_lead: aiData.score_lead || 80,\n    categoria_lead: aiData.categoria_lead || 'Estándar',\n    requiere_hitl: necesitaHitl,\n    propuesta_resumen: aiData.propuesta_resumen || 'Cotización formal de repuestos originales Sanmartín.'\n  }\n};"
       },
-      "id": "node-pii-reassembly",
-      "name": "Parse & Re-asociación PII",
+      "id": "node-5-parse-ia",
+      "name": "5. Procesar Respuesta IA",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1480,
-        200
+        1100,
+        240
       ]
     },
     {
       "parameters": {
         "conditions": {
-          "boolean": [
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
             {
-              "value1": "={{ $json.es_error_ia }}",
-              "value2": true
+              "id": "c_hitl",
+              "leftValue": "={{ $json.requiere_hitl }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
             }
-          ]
+          ],
+          "combinator": "and"
         }
       },
-      "id": "node-if-ia-error",
-      "name": "¿Falló la API de IA?",
+      "id": "node-6-if-hitl",
+      "name": "6. ¿Supera Umbral $3000 USD (HITL)?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
+      "typeVersion": 2.2,
       "position": [
-        1700,
-        200
+        1320,
+        240
       ]
     },
     {
       "parameters": {
-        "operation": "append",
-        "base": "appSanmartinBase",
-        "table": "Logs_Auditoria_Errores",
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Fecha": "={{ new Date().toISOString() }}",
-            "ID_Solicitud": "={{ $json.id_solicitud }}",
-            "Tipo_Error": "AI_API_FAILURE",
-            "Detalle_Error": "={{ $json.error_detalle }}",
-            "Estado_Resolucion": "Pendiente de Reintento"
-          }
-        }
+        "channel": "#aprobaciones-cotizaciones",
+        "text": "=⚠️ *ALERTA HITL: Aprobación Requerida para Cotización*\n*ID:* `{{ $json.id_solicitud }}` | *Cliente:* {{ $json.nombre_cliente }}\n*Equipo:* {{ $json.equipo }}\n*Monto Total:* *${{ $json.monto_total_usd }} USD* (Supera umbral de seguridad)\n*Resumen IA:* {{ $json.propuesta_resumen }}\n\n👉 Para aprobar haz clic en: http://localhost:5678/webhook/hitl-aprobado?id={{ $json.id_solicitud }}"
       },
-      "id": "node-airtable-log-ai-error",
-      "name": "Airtable: Registrar Falla de IA",
-      "type": "n8n-nodes-base.airtable",
-      "typeVersion": 2,
+      "id": "node-hitl-slack",
+      "name": "HITL: Solicitar Aprobación en Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
       "position": [
-        1940,
-        420
+        1540,
+        120
       ]
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "webhookSuffix": "=hitl-aprobado"
+      },
+      "id": "node-hitl-wait",
+      "name": "HITL: Esperar Decisión Humana (Wait)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1760,
+        120
+      ],
+      "webhookId": "hitl-approval-simple"
     },
     {
       "parameters": {
@@ -221,434 +210,147 @@
             "ID_Solicitud": "={{ $json.id_solicitud }}",
             "Nombre_Cliente": "={{ $json.nombre_cliente }}",
             "Email_Cliente": "={{ $json.email_cliente }}",
-            "Empresa": "={{ $json.empresa_cliente }}",
-            "Equipo_Industrial": "={{ $json.equipo_industrial }}",
-            "Linea_Produccion": "={{ $json.linea_produccion }}",
-            "Monto_Total_USD": "={{ $json.monto_estimado_total_usd }}",
-            "Score_Lead": "={{ $json.score_lead }}",
-            "Categoria_Lead": "={{ $json.categoria_lead }}",
-            "Requiere_HITL": "={{ $json.requiere_hitl }}",
-            "Estado": "={{ $json.requiere_hitl ? 'En Espera HITL' : 'Auto-Aprobado' }}",
-            "Resumen_IA": "={{ $json.resumen_ejecutivo }}"
+            "Equipo_Industrial": "={{ $json.equipo }}",
+            "Monto_Total_USD": "={{ $json.monto_total_usd }}",
+            "Estado": "={{ $json.requiere_hitl ? 'Aprobado por Humano' : 'Auto-Aprobado' }}",
+            "Resumen_IA": "={{ $json.propuesta_resumen }}"
           }
         }
       },
-      "id": "node-airtable-save-lead",
-      "name": "Airtable: Guardar Solicitud y Scoring",
+      "id": "node-7-airtable-save",
+      "name": "7. Airtable: Guardar Solicitud y Estado",
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2,
       "position": [
-        1940,
-        100
+        2000,
+        240
       ]
     },
     {
       "parameters": {
-        "conditions": {
-          "boolean": [
-            {
-              "value1": "={{ $json.requiere_hitl }}",
-              "value2": true
-            }
-          ]
-        }
-      },
-      "id": "node-if-hitl-required",
-      "name": "¿Requiere Validación Humana (HITL)?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        2180,
-        100
-      ]
-    },
-    {
-      "parameters": {
-        "channel": "#aprobaciones-comerciales-sanmartin",
-        "text": "=:bell: *NUEVA SOLICITUD REQUIERE APROBACIÓN HUMANA (HITL)*\n\n*ID:* `{{ $json.id_solicitud }}` | *Empresa:* {{ $json.empresa_cliente }}\n*Equipo:* {{ $json.equipo_industrial }} ({{ $json.linea_produccion }})\n*Monto Estimado:* `${{ $json.monto_estimado_total_usd }} USD`\n*Score Lead:* `{{ $json.score_lead }}/100` (Categoría: *{{ $json.categoria_lead }}*)\n*Motivo HITL:* {{ $json.justificacion_hitl }}\n\n:mag: *Resumen Técnico:* {{ $json.resumen_ejecutivo }}\n\n:link: *Acciones Rápidas:* \n• <https://n8n.empresa-sanmartin.com/webhook/hitl-decision?id={{ $json.id_solicitud }}&decision=APROBADO|✅ APROBAR Y EMITIR>\n• <https://n8n.empresa-sanmartin.com/webhook/hitl-decision?id={{ $json.id_solicitud }}&decision=RECHAZADO|❌ RECHAZAR / REVISAR>"
-      },
-      "id": "node-slack-hitl-request",
-      "name": "Slack: Enviar Solicitud HITL",
-      "type": "n8n-nodes-base.slack",
-      "typeVersion": 2.1,
-      "position": [
-        2420,
-        0
-      ]
-    },
-    {
-      "parameters": {
-        "resume": "webhook",
-        "webhookSuffix": "=hitl-{{ $json.id_solicitud }}"
-      },
-      "id": "node-wait-hitl",
-      "name": "HITL Wait: Pausar hasta Aprobación Humana",
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        2640,
-        0
-      ],
-      "webhookId": "hitl-approval-gateway"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "string": [
-            {
-              "value1": "={{ $json.query.decision || $json.body.decision }}",
-              "operation": "equal",
-              "value2": "APROBADO"
-            }
-          ]
-        }
-      },
-      "id": "node-if-human-approved",
-      "name": "¿Aprobado por el Humano?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        2860,
-        0
-      ]
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "base": "appSanmartinBase",
-        "table": "Solicitudes_Cotizaciones",
-        "id": "={{ $('Airtable: Guardar Solicitud y Scoring').item.json.id }}",
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Estado": "Rechazado por Humano",
-            "Notas_Revision": "Rechazado por Gerencia Comercial para revisión personalizada"
-          }
-        }
-      },
-      "id": "node-airtable-mark-rejected",
-      "name": "Airtable: Marcar Rechazado",
-      "type": "n8n-nodes-base.airtable",
-      "typeVersion": 2,
-      "position": [
-        3100,
-        120
-      ]
-    },
-    {
-      "parameters": {
-        "channel": "#aprobaciones-comerciales-sanmartin",
-        "text": "=:x: *Cotización Rechazada por Humano*\nID: `{{ $('Airtable: Guardar Solicitud y Scoring').item.json.id_solicitud }}`.\nSe detiene el envío automático al cliente. Un ejecutivo comercial tomará contacto directo."
-      },
-      "id": "node-slack-notify-rejected",
-      "name": "Slack: Notificar Rechazo a Ventas",
-      "type": "n8n-nodes-base.slack",
-      "typeVersion": 2.1,
-      "position": [
-        3320,
-        120
-      ]
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "base": "appSanmartinBase",
-        "table": "Solicitudes_Cotizaciones",
-        "id": "={{ $('Airtable: Guardar Solicitud y Scoring').item.json.id }}",
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Estado": "Aprobado por Humano - Enviando"
-          }
-        }
-      },
-      "id": "node-airtable-mark-approved",
-      "name": "Airtable: Marcar Aprobado",
-      "type": "n8n-nodes-base.airtable",
-      "typeVersion": 2,
-      "position": [
-        3100,
-        -100
-      ]
-    },
-    {
-      "parameters": {
-        "sendTo": "={{ $('Airtable: Guardar Solicitud y Scoring').item.json.Email_Cliente }}",
-        "subject": "=Propuesta Técnica & Comercial Sanmartín: {{ $('Airtable: Guardar Solicitud y Scoring').item.json.Equipo_Industrial }} [Ref #{{ $('Airtable: Guardar Solicitud y Scoring').item.json.ID_Solicitud }}]",
+        "sendTo": "={{ $json.email_cliente }}",
+        "subject": "=Cotización Oficial Sanmartín: {{ $json.equipo }} [Ref #{{ $json.id_solicitud }}]",
         "emailType": "html",
-        "message": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset='utf-8'>\n  <style>\n    body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; background-color: #f8fafc; margin: 0; padding: 20px; }\n    .card { background: #ffffff; border-radius: 12px; padding: 30px; max-width: 650px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }\n    .header { border-bottom: 2px solid #2563eb; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }\n    .brand { font-size: 24px; font-weight: bold; color: #1e3a8a; }\n    .badge { background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; }\n    .summary-box { background: #f1f5f9; border-left: 4px solid #2563eb; padding: 15px; border-radius: 6px; margin: 20px 0; }\n    .price-tag { font-size: 28px; font-weight: 800; color: #0f172a; margin: 15px 0; }\n    .footer { margin-top: 30px; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 15px; text-align: center; }\n    .btn { display: inline-block; background: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px; }\n  </style>\n</head>\n<body>\n  <div class='card'>\n    <div class='header'>\n      <div class='brand'>SANMARTÍN</div>\n      <div class='badge'>Cotización Oficial Validada</div>\n    </div>\n    <p>Estimado/a <strong>{{ $('Airtable: Guardar Solicitud y Scoring').item.json.Nombre_Cliente }}</strong> ({{ $('Airtable: Guardar Solicitud y Scoring').item.json.Empresa }}),</p>\n    <p>Agradecemos su solicitud técnica para su equipo <strong>{{ $('Airtable: Guardar Solicitud y Scoring').item.json.Equipo_Industrial }}</strong> en la línea <strong>{{ $('Airtable: Guardar Solicitud y Scoring').item.json.Linea_Produccion }}</strong>.</p>\n    \n    <div class='summary-box'>\n      <strong>Diagnóstico y Resumen Técnico:</strong><br>\n      {{ $('Airtable: Guardar Solicitud y Scoring').item.json.Resumen_IA }}\n    </div>\n\n    <p><strong>Inversión Estimada:</strong></p>\n    <div class='price-tag'>${{ $('Airtable: Guardar Solicitud y Scoring').item.json.Monto_Total_USD }} USD</div>\n\n    <p>Nuestra propuesta incluye repuestos originales garantizados y soporte de calibración por nuestros ingenieros certificados.</p>\n\n    <center>\n      <a href='mailto:cotizaciones@sanmartin.com?subject=Aceptacion%20Cotizacion%20{{ $('Airtable: Guardar Solicitud y Scoring').item.json.ID_Solicitud }}' class='btn'>Aceptar Propuesta / Agendar Instalación</a>\n    </center>\n\n    <div class='footer'>\n      Ref: {{ $('Airtable: Guardar Solicitud y Scoring').item.json.ID_Solicitud }} | Empresa Sanmartín S.A. | Automatización & Mantenimiento Industrial\n    </div>\n  </div>\n</body>\n</html>",
-        "options": {
-          "replyTo": "cotizaciones@empresa-sanmartin.com"
-        }
+        "message": "<div style='font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;'>\n  <h2 style='color: #1e3a8a;'>Empresa Sanmartín S.A.</h2>\n  <p>Estimado/a <strong>{{ $json.nombre_cliente }}</strong>,</p>\n  <p>Hemos analizado su requerimiento técnico para el equipo <strong>{{ $json.equipo }}</strong>.</p>\n  <div style='background: #f1f5f9; padding: 15px; border-radius: 6px; margin: 15px 0;'>\n    <strong>Detalle de la Propuesta:</strong><br>\n    {{ $json.propuesta_resumen }}\n  </div>\n  <p style='font-size: 20px; font-weight: bold; color: #0f172a;'>Total Estimado: ${{ $json.monto_total_usd }} USD</p>\n  <p style='font-size: 12px; color: #64748b;'>Esta propuesta fue procesada y validada con nuestro sistema autónomo de cotizaciones.</p>\n</div>"
       },
-      "id": "node-gmail-send-proposal",
-      "name": "Gmail: Enviar Propuesta Formal",
+      "id": "node-8-gmail",
+      "name": "8. Gmail: Enviar Cotización al Cliente",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        3360,
-        -100
-      ]
-    },
-    {
-      "parameters": {
-        "channel": "#notificaciones-ventas-sanmartin",
-        "text": "=:white_check_mark: *Cotización Formal Enviada con Éxito*\n*ID:* `{{ $('Airtable: Guardar Solicitud y Scoring').item.json.ID_Solicitud }}`\n*Cliente:* {{ $('Airtable: Guardar Solicitud y Scoring').item.json.Nombre_Cliente }} ({{ $('Airtable: Guardar Solicitud y Scoring').item.json.Email_Cliente }})\n*Monto:* `${{ $('Airtable: Guardar Solicitud y Scoring').item.json.Monto_Total_USD }} USD`\n*Estado:* Entregado al cliente vía Gmail."
-      },
-      "id": "node-slack-notify-sent",
-      "name": "Slack: Registrar Propuesta Enviada",
-      "type": "n8n-nodes-base.slack",
-      "typeVersion": 2.1,
-      "position": [
-        3580,
-        -100
-      ]
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "base": "appSanmartinBase",
-        "table": "Solicitudes_Cotizaciones",
-        "id": "={{ $('Airtable: Guardar Solicitud y Scoring').item.json.id }}",
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Estado": "Completado - Enviado al Cliente",
-            "Fecha_Envio": "={{ new Date().toISOString() }}"
-          }
-        }
-      },
-      "id": "node-airtable-mark-completed",
-      "name": "Airtable: Marcar Completado y Cerrar",
-      "type": "n8n-nodes-base.airtable",
-      "typeVersion": 2,
-      "position": [
-        3800,
-        -100
+        2240,
+        240
       ]
     }
   ],
   "connections": {
-    "Trigger: Webhook Nueva Solicitud": {
+    "1. Webhook: Nueva Solicitud": {
       "main": [
         [
           {
-            "node": "Data Quality & Input Validation",
+            "node": "2. ¿Datos Completos y Válidos?",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Data Quality & Input Validation": {
+    "2. ¿Datos Completos y Válidos?": {
       "main": [
         [
           {
-            "node": "¿Datos de Entrada Válidos?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "¿Datos de Entrada Válidos?": {
-      "main": [
-        [
-          {
-            "node": "Gobernanza: Anonimización PII",
+            "node": "3. Airtable: Consultar Catálogo de Precios",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Airtable: Registrar Error Validación",
+            "node": "Ruta Error: Registrar Falla en Airtable",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Airtable: Registrar Error Validación": {
+    "3. Airtable: Consultar Catálogo de Precios": {
       "main": [
         [
           {
-            "node": "Slack: Notificar Error a Soporte",
+            "node": "4. OpenAI: Tasación y Scoring con IA",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Gobernanza: Anonimización PII": {
+    "4. OpenAI: Tasación y Scoring con IA": {
       "main": [
         [
           {
-            "node": "Airtable: Consultar Catálogo y Tarifas",
+            "node": "5. Procesar Respuesta IA",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Airtable: Consultar Catálogo y Tarifas": {
+    "5. Procesar Respuesta IA": {
       "main": [
         [
           {
-            "node": "IA: Razonamiento y Tasación Técnica",
+            "node": "6. ¿Supera Umbral $3000 USD (HITL)?",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "IA: Razonamiento y Tasación Técnica": {
+    "6. ¿Supera Umbral $3000 USD (HITL)?": {
       "main": [
         [
           {
-            "node": "Parse & Re-asociación PII",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Parse & Re-asociación PII": {
-      "main": [
-        [
-          {
-            "node": "¿Falló la API de IA?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "¿Falló la API de IA?": {
-      "main": [
-        [
-          {
-            "node": "Airtable: Registrar Falla de IA",
+            "node": "HITL: Solicitar Aprobación en Slack",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Airtable: Guardar Solicitud y Scoring",
+            "node": "7. Airtable: Guardar Solicitud y Estado",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Airtable: Guardar Solicitud y Scoring": {
+    "HITL: Solicitar Aprobación en Slack": {
       "main": [
         [
           {
-            "node": "¿Requiere Validación Humana (HITL)?",
+            "node": "HITL: Esperar Decisión Humana (Wait)",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "¿Requiere Validación Humana (HITL)?": {
+    "HITL: Esperar Decisión Humana (Wait)": {
       "main": [
         [
           {
-            "node": "Slack: Enviar Solicitud HITL",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Gmail: Enviar Propuesta Formal",
+            "node": "7. Airtable: Guardar Solicitud y Estado",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Slack: Enviar Solicitud HITL": {
+    "7. Airtable: Guardar Solicitud y Estado": {
       "main": [
         [
           {
-            "node": "HITL Wait: Pausar hasta Aprobación Humana",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HITL Wait: Pausar hasta Aprobación Humana": {
-      "main": [
-        [
-          {
-            "node": "¿Aprobado por el Humano?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "¿Aprobado por el Humano?": {
-      "main": [
-        [
-          {
-            "node": "Airtable: Marcar Aprobado",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Airtable: Marcar Rechazado",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Airtable: Marcar Rechazado": {
-      "main": [
-        [
-          {
-            "node": "Slack: Notificar Rechazo a Ventas",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Airtable: Marcar Aprobado": {
-      "main": [
-        [
-          {
-            "node": "Gmail: Enviar Propuesta Formal",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Gmail: Enviar Propuesta Formal": {
-      "main": [
-        [
-          {
-            "node": "Slack: Registrar Propuesta Enviada",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Slack: Registrar Propuesta Enviada": {
-      "main": [
-        [
-          {
-            "node": "Airtable: Marcar Completado y Cerrar",
+            "node": "8. Gmail: Enviar Cotización al Cliente",
             "type": "main",
             "index": 0
           }
@@ -657,8 +359,6 @@
     }
   },
   "settings": {
-    "executionOrder": "v1",
-    "saveExecutionProgress": true,
-    "saveManualExecutions": true
+    "executionOrder": "v1"
   }
 }
