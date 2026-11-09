@@ -122,6 +122,7 @@ IA Automation/
 │   ├── stress_test_matrix.md                         <- Documentación de las pruebas de estrés
 │   └── mock_test_payloads.json                       <- Payloads JSON listos para pruebas
 ├── docs/
+│   ├── bitacora_desarrollo_desafios.md               <- Registro de ingeniería y desafíos técnicos resueltos
 │   └── checklist_seguridad_arquitectura.md           <- Checklist de seguridad y resiliencia
 └── assets/
     └── diagramas/
