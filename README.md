@@ -6,6 +6,7 @@
 [![OpenAI](https://img.shields.io/badge/Razonamiento-GPT--4o--mini%20(JSON)-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
 [![Slack](https://img.shields.io/badge/HITL-Slack%20Interactive-4A154B?style=for-the-badge&logo=slack&logoColor=white)](https://slack.com/)
 [![Gmail](https://img.shields.io/badge/Salida-Gmail%20API-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](https://workspace.google.com/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-MiqueasSilva%2FIA--Automation--Final-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MiqueasSilva/IA-Automation-Final)
 [![Status](https://img.shields.io/badge/Estado-Producci%C3%B3n%20v2.4-10B981?style=for-the-badge)]()
 
 ---
