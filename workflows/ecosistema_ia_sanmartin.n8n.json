@@ -3,17 +3,35 @@
   "nodes": [
     {
       "parameters": {
+        "method": "POST",
+        "url": "http://n8n_ollama:11434/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"qwen2.5:7b\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Eres el tasador técnico de Empresa Sanmartín. Analiza el requerimiento y responde estrictamente un JSON válido con esta estructura:\\n{\\n  \\\"equipo\\\": \\\"nombre del equipo\\\",\\n  \\\"repuestos_estimados\\\": [\\\"item 1\\\", \\\"item 2\\\"],\\n  \\\"monto_total_usd\\\": 4200,\\n  \\\"score_lead\\\": 90,\\n  \\\"categoria_lead\\\": \\\"VIP o Estándar\\\",\\n  \\\"requiere_aprobacion\\\": true,\\n  \\\"propuesta_resumen\\\": \\\"texto breve de la cotización\\\"\\n}\\nRegla: Si el monto_total_usd supera 3000 USD, marca requiere_aprobacion: true.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Cliente: {{ $('2. ¿Datos Completos y Válidos?1').item.json.body?.nombre_cliente || $('2. ¿Datos Completos y Válidos?1').item.json.nombre_cliente }}. Equipo: {{ $('2. ¿Datos Completos y Válidos?1').item.json.body?.equipo_industrial || $('2. ¿Datos Completos y Válidos?1').item.json.equipo_industrial }}. Solicitud: {{ $('2. ¿Datos Completos y Válidos?1').item.json.body?.mensaje || $('2. ¿Datos Completos y Válidos?1').item.json.mensaje }}\"\n    }\n  ],\n  \"stream\": false,\n  \"format\": \"json\"\n}",
+        "options": {}
+      },
+      "id": "d088eaff-4b55-4dec-aa43-084eaac7358e",
+      "name": "4. IA: Razonamiento con Ollama (qwen2.5:7b)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -368,
+        656
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
         "path": "nueva-solicitud",
         "options": {}
       },
-      "id": "node-1-webhook",
-      "name": "1. Webhook: Nueva Solicitud",
+      "id": "f0109fd7-fdd1-4bb1-a1a4-b79b795f0e45",
+      "name": "1. Webhook: Nueva Solicitud1",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        200,
-        300
+        -1056,
+        704
       ],
       "webhookId": "nueva-solicitud-webhook"
     },
@@ -23,7 +41,8 @@
           "options": {
             "caseSensitive": true,
             "leftValue": "",
-            "typeValidation": "strict"
+            "typeValidation": "strict",
+            "version": 1
           },
           "conditions": [
             {
@@ -46,101 +65,198 @@
             }
           ],
           "combinator": "and"
-        }
+        },
+        "options": {}
       },
-      "id": "node-2-valida-input",
-      "name": "2. ¿Datos Completos y Válidos?",
+      "id": "9ece9b29-9c86-4ecc-93c6-e76da5bb9d86",
+      "name": "2. ¿Datos Completos y Válidos?1",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        420,
-        300
+        -832,
+        704
       ]
     },
     {
       "parameters": {
-        "operation": "append",
+        "operation": "create",
         "base": {
           "__rl": true,
-          "value": "Sanmartin_Ecosistema_IA",
-          "mode": "list"
+          "value": "appGSOBTx2qVlZB27",
+          "mode": "list",
+          "cachedResultName": "Sanmartin_Ecosistema_IA",
+          "cachedResultUrl": "https://airtable.com/appGSOBTx2qVlZB27"
         },
         "table": {
           "__rl": true,
-          "value": "Logs_Auditoria_Errores",
-          "mode": "list"
+          "value": "tblFmHhqcAWlNJBNj",
+          "mode": "list",
+          "cachedResultName": "Logs_Auditoria_Errores",
+          "cachedResultUrl": "https://airtable.com/appGSOBTx2qVlZB27/tblFmHhqcAWlNJBNj"
         },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "Tipo_Error": "DATOS_INVALIDOS",
-            "Detalle_Tecnico": "=Faltan campos obligatorios o email sin formato válido.",
-            "Payload_Recibido": "={{ JSON.stringify($json) }}"
-          }
-        }
+            "Notificado_Admin": false,
+            "Tipo_Error": "VALIDATION_ERROR",
+            "Detalle_Tecnico": "Faltan campos obligatorios o email sin formato válido."
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID_Log",
+              "displayName": "ID_Log",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha_Timestamp",
+              "displayName": "Fecha_Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ID_Solicitud",
+              "displayName": "ID_Solicitud",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tipo_Error",
+              "displayName": "Tipo_Error",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Severidad",
+              "displayName": "Severidad",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Detalle_Tecnico",
+              "displayName": "Detalle_Tecnico",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado_Resolucion",
+              "displayName": "Estado_Resolucion",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Notificado_Admin",
+              "displayName": "Notificado_Admin",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
       },
-      "id": "node-error-db",
-      "name": "Ruta Error: Registrar Falla en Airtable",
+      "id": "01d5bbc1-86cd-485f-9614-96b3f5052606",
+      "name": "Ruta Error: Registrar Falla en Airtable1",
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2,
       "position": [
-        640,
-        480
-      ]
+        -608,
+        944
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "lYJ8oziZ19S53ZiV",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
     },
     {
       "parameters": {
         "operation": "search",
         "base": {
           "__rl": true,
-          "value": "Sanmartin_Ecosistema_IA",
-          "mode": "list"
+          "value": "appGSOBTx2qVlZB27",
+          "mode": "list",
+          "cachedResultName": "Sanmartin_Ecosistema_IA",
+          "cachedResultUrl": "https://airtable.com/appGSOBTx2qVlZB27"
         },
         "table": {
           "__rl": true,
-          "value": "Catalogo_Maquinaria_Repuestos",
-          "mode": "list"
+          "value": "tblPotldR5JN1Dxif",
+          "mode": "list",
+          "cachedResultName": "Catalogo_Maquinaria_Repuestos",
+          "cachedResultUrl": "https://airtable.com/appGSOBTx2qVlZB27/tblPotldR5JN1Dxif"
         },
-        "additionalOptions": {}
+        "options": {}
       },
-      "id": "node-3-airtable-context",
-      "name": "3. Airtable: Consultar Catálogo de Precios",
+      "id": "e8315bce-374b-46ce-a80c-71cbc161427d",
+      "name": "3. Airtable: Consultar Catálogo de Precios1",
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2,
       "position": [
-        640,
-        240
-      ]
+        -608,
+        656
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "lYJ8oziZ19S53ZiV",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "http://n8n_ollama:11434/api/chat",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"qwen2.5:7b\",\n  \"keep_alive\": \"0s\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Eres el tasador técnico de Empresa Sanmartín. Analiza el requerimiento y responde estrictamente un JSON válido con esta estructura:\\n{\\n  \\\"equipo\\\": \\\"nombre del equipo\\\",\\n  \\\"repuestos_estimados\\\": [\\\"item 1\\\", \\\"item 2\\\"],\\n  \\\"monto_total_usd\\\": 4200,\\n  \\\"score_lead\\\": 90,\\n  \\\"categoria_lead\\\": \\\"VIP o Estándar\\\",\\n  \\\"requiere_aprobacion\\\": true,\\n  \\\"propuesta_resumen\\\": \\\"texto breve de la cotización\\\"\\n}\\nRegla: Si el monto_total_usd supera 3000 USD, marca requiere_aprobacion: true.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Cliente: {{ $('2. ¿Datos Completos y Válidos?').item.json.body?.nombre_cliente || $('2. ¿Datos Completos y Válidos?').item.json.nombre_cliente }}. Equipo: {{ $('2. ¿Datos Completos y Válidos?').item.json.body?.equipo_industrial || $('2. ¿Datos Completos y Válidos?').item.json.equipo_industrial }}. Solicitud: {{ $('2. ¿Datos Completos y Válidos?').item.json.body?.mensaje || $('2. ¿Datos Completos y Válidos?').item.json.mensaje }}\"\n    }\n  ],\n  \"stream\": false,\n  \"format\": \"json\"\n}",
-        "options": {}
+        "jsCode": "// Parsear salida JSON de Ollama / LLM de forma segura\nconst content = $json.message?.content || '{}';\nlet aiData = {};\ntry {\n  aiData = typeof content === 'string' ? JSON.parse(content) : content;\n} catch (e) {\n  aiData = { monto_total_usd: 1500, requiere_aprobacion: false, propuesta_resumen: content };\n}\n\nconst inputData = $('2. ¿Datos Completos y Válidos?1').item.json.body || $('2. ¿Datos Completos y Válidos?1').item.json;\nconst monto = Number(aiData.monto_total_usd) || 0;\nconst necesitaHitl = monto > 3000 || aiData.requiere_aprobacion === true;\n\nreturn {\n  json: {\n    id_solicitud: 'COT-' + Math.floor(1000 + Math.random() * 9000),\n    nombre_cliente: inputData.nombre_cliente || 'Cliente Industrial',\n    email_cliente: inputData.email_cliente,\n    equipo: aiData.equipo || inputData.equipo_industrial || 'Lavadora de botellas',\n    monto_total_usd: monto,\n    score_lead: aiData.score_lead || 80,\n    categoria_lead: aiData.categoria_lead || 'Estándar',\n    requiere_hitl: necesitaHitl,\n    propuesta_resumen: aiData.propuesta_resumen || 'Cotización formal de repuestos originales Sanmartín.'\n  }\n};"
       },
-      "id": "node-4-ollama",
-      "name": "4. IA: Razonamiento con Ollama (qwen2.5:7b)",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        880,
-        240
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "// Parsear salida JSON de Ollama / LLM de forma segura\nconst content = $json.message?.content || '{}';\nlet aiData = {};\ntry {\n  aiData = typeof content === 'string' ? JSON.parse(content) : content;\n} catch (e) {\n  aiData = { monto_total_usd: 1500, requiere_aprobacion: false, propuesta_resumen: content };\n}\n\nconst inputData = $('2. ¿Datos Completos y Válidos?').item.json.body || $('2. ¿Datos Completos y Válidos?').item.json;\nconst monto = Number(aiData.monto_total_usd) || 0;\nconst necesitaHitl = monto > 3000 || aiData.requiere_aprobacion === true;\n\nreturn {\n  json: {\n    id_solicitud: 'COT-' + Math.floor(1000 + Math.random() * 9000),\n    nombre_cliente: inputData.nombre_cliente || 'Cliente Industrial',\n    email_cliente: inputData.email_cliente,\n    equipo: aiData.equipo || inputData.equipo_industrial || 'Lavadora de botellas',\n    monto_total_usd: monto,\n    score_lead: aiData.score_lead || 80,\n    categoria_lead: aiData.categoria_lead || 'Estándar',\n    requiere_hitl: necesitaHitl,\n    propuesta_resumen: aiData.propuesta_resumen || 'Cotización formal de repuestos originales Sanmartín.'\n  }\n};"
-      },
-      "id": "node-5-parse-ia",
-      "name": "5. Procesar Respuesta IA",
+      "id": "f04ae912-cb1e-4e25-a9a3-9e35128554c0",
+      "name": "5. Procesar Respuesta IA1",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1100,
-        240
+        -160,
+        656
       ]
     },
     {
@@ -149,7 +265,8 @@
           "options": {
             "caseSensitive": true,
             "leftValue": "",
-            "typeValidation": "strict"
+            "typeValidation": "strict",
+            "version": 1
           },
           "conditions": [
             {
@@ -163,115 +280,307 @@
             }
           ],
           "combinator": "and"
-        }
+        },
+        "options": {}
       },
-      "id": "node-6-if-hitl",
-      "name": "6. ¿Supera Umbral $3000 USD (HITL)?",
+      "id": "7627f3c6-ff16-4b9b-bd23-f95fec591720",
+      "name": "6. ¿Supera Umbral $3000 USD (HITL)?1",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1320,
-        240
+        80,
+        656
       ]
     },
     {
       "parameters": {
         "resume": "webhook",
-        "webhookSuffix": "=hitl-aprobado"
+        "options": {}
       },
-      "id": "node-hitl-wait",
-      "name": "HITL: Pausar hasta Aprobación Humana (Wait)",
+      "id": "73d2341c-e481-4f27-a14a-2520b78f2faa",
+      "name": "HITL: Esperar Decisión Humana (Wait)1",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1600,
-        140
+        384,
+        496
       ],
       "webhookId": "hitl-approval-simple"
     },
     {
       "parameters": {
-        "operation": "append",
+        "operation": "create",
         "base": {
           "__rl": true,
-          "value": "Sanmartin_Ecosistema_IA",
-          "mode": "list"
+          "value": "appGSOBTx2qVlZB27",
+          "mode": "list",
+          "cachedResultName": "Sanmartin_Ecosistema_IA",
+          "cachedResultUrl": "https://airtable.com/appGSOBTx2qVlZB27"
         },
         "table": {
           "__rl": true,
-          "value": "Solicitudes_Cotizaciones",
-          "mode": "list"
+          "value": "tbluszroBkgidXqLy",
+          "mode": "list",
+          "cachedResultName": "Solicitudes_Cotizaciones",
+          "cachedResultUrl": "https://airtable.com/appGSOBTx2qVlZB27/tbluszroBkgidXqLy"
         },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
+            "Requiere_HITL": false,
             "ID_Solicitud": "={{ $json.id_solicitud }}",
             "Nombre_Cliente": "={{ $json.nombre_cliente }}",
             "Email_Cliente": "={{ $json.email_cliente }}",
             "Equipo_Industrial": "={{ $json.equipo }}",
             "Monto_Total_USD": "={{ $json.monto_total_usd }}",
+            "Score_Lead": "={{ $json.score_lead }}",
             "Estado": "={{ $json.requiere_hitl ? 'Aprobado por Humano' : 'Auto-Aprobado' }}",
             "Resumen_IA": "={{ $json.propuesta_resumen }}"
-          }
-        }
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID_Solicitud",
+              "displayName": "ID_Solicitud",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Nombre_Cliente",
+              "displayName": "Nombre_Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email_Cliente",
+              "displayName": "Email_Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Empresa",
+              "displayName": "Empresa",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Equipo_Industrial",
+              "displayName": "Equipo_Industrial",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Linea_Produccion",
+              "displayName": "Linea_Produccion",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Mensaje_Requerimiento",
+              "displayName": "Mensaje_Requerimiento",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Monto_Total_USD",
+              "displayName": "Monto_Total_USD",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Score_Lead",
+              "displayName": "Score_Lead",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Categoria_Lead",
+              "displayName": "Categoria_Lead",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Requiere_HITL",
+              "displayName": "Requiere_HITL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resumen_IA",
+              "displayName": "Resumen_IA",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha_Ingreso",
+              "displayName": "Fecha_Ingreso",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
       },
-      "id": "node-7-airtable-save",
-      "name": "7. Airtable: Guardar Solicitud y Estado",
+      "id": "353012de-fbb4-425f-8cd8-0b6c832aef13",
+      "name": "7. Airtable: Guardar Solicitud y Estado1",
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2,
       "position": [
-        1900,
-        240
-      ]
+        752,
+        656
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "lYJ8oziZ19S53ZiV",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
     },
     {
       "parameters": {
-        "sendTo": "={{ $json.email_cliente }}",
-        "subject": "=Cotización Oficial Sanmartín: {{ $json.equipo }} [Ref #{{ $json.id_solicitud }}]",
-        "emailType": "html",
-        "message": "<div style='font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;'>\n  <h2 style='color: #1e3a8a;'>Empresa Sanmartín S.A.</h2>\n  <p>Estimado/a <strong>{{ $json.nombre_cliente }}</strong>,</p>\n  <p>Hemos analizado su requerimiento técnico para el equipo <strong>{{ $json.equipo }}</strong>.</p>\n  <div style='background: #f1f5f9; padding: 15px; border-radius: 6px; margin: 15px 0;'>\n    <strong>Detalle de la Propuesta:</strong><br>\n    {{ $json.propuesta_resumen }}\n  </div>\n  <p style='font-size: 20px; font-weight: bold; color: #0f172a;'>Total Estimado: ${{ $json.monto_total_usd }} USD</p>\n  <p style='font-size: 12px; color: #64748b;'>Esta propuesta fue procesada y validada con nuestro sistema autónomo de cotizaciones.</p>\n</div>"
+        "sendTo": "=miqueas.silva.trabajo@gmail.com",
+        "subject": "=Cotización Oficial Sanmartín: {{ $('5. Procesar Respuesta IA1').item.json.equipo }} [Ref #{{ $('5. Procesar Respuesta IA1').item.json.id_solicitud }}]",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;\">\n  <h2 style=\"color: #1e3a8a;\">Empresa Sanmartín S.A.</h2>\n  <p>Estimado/a <strong>{{ $('5. Procesar Respuesta IA1').item.json.nombre_cliente }}</strong>,</p>\n  <p>Hemos analizado su requerimiento técnico para el equipo <strong>{{ $('5. Procesar Respuesta IA1').item.json.equipo }}</strong>.</p>\n  <div style=\"background: #f1f5f9; padding: 15px; border-radius: 6px; margin: 15px 0;\">\n    <strong>Detalle de la Propuesta:</strong><br>\n    {{ $('5. Procesar Respuesta IA1').item.json.propuesta_resumen }}\n  </div>\n  <p style=\"font-size: 20px; font-weight: bold; color: #0f172a;\">Total Estimado: ${{ $('5. Procesar Respuesta IA1').item.json.monto_total_usd }} USD</p>\n  <p style=\"font-size: 12px; color: #64748b;\">Propuesta técnica y comercial aprobada por el sistema autónomo.</p>\n</div>",
+        "options": {}
       },
-      "id": "node-8-gmail",
-      "name": "8. Gmail: Enviar Cotización al Cliente",
+      "id": "48fc8fb4-4af3-44c6-a113-cede8012b5f1",
+      "name": "8. Gmail: Enviar Cotización al Cliente1",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        2150,
-        240
-      ]
+        992,
+        656
+      ],
+      "webhookId": "ded2a189-1b68-4ea2-8e9a-6e4115286b5a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "p7kRvWto02UngqjK",
+          "name": "Gmail account"
+        }
+      }
     }
   ],
+  "pinData": {},
   "connections": {
-    "1. Webhook: Nueva Solicitud": {
+    "4. IA: Razonamiento con Ollama (qwen2.5:7b)": {
       "main": [
         [
           {
-            "node": "2. ¿Datos Completos y Válidos?",
+            "node": "5. Procesar Respuesta IA1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "2. ¿Datos Completos y Válidos?": {
+    "1. Webhook: Nueva Solicitud1": {
       "main": [
         [
           {
-            "node": "3. Airtable: Consultar Catálogo de Precios",
+            "node": "2. ¿Datos Completos y Válidos?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. ¿Datos Completos y Válidos?1": {
+      "main": [
+        [
+          {
+            "node": "3. Airtable: Consultar Catálogo de Precios1",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Ruta Error: Registrar Falla en Airtable",
+            "node": "Ruta Error: Registrar Falla en Airtable1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "3. Airtable: Consultar Catálogo de Precios": {
+    "3. Airtable: Consultar Catálogo de Precios1": {
       "main": [
         [
           {
@@ -282,62 +591,51 @@
         ]
       ]
     },
-    "4. IA: Razonamiento con Ollama (qwen2.5:7b)": {
+    "5. Procesar Respuesta IA1": {
       "main": [
         [
           {
-            "node": "5. Procesar Respuesta IA",
+            "node": "6. ¿Supera Umbral $3000 USD (HITL)?1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "5. Procesar Respuesta IA": {
+    "6. ¿Supera Umbral $3000 USD (HITL)?1": {
       "main": [
         [
           {
-            "node": "6. ¿Supera Umbral $3000 USD (HITL)?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "6. ¿Supera Umbral $3000 USD (HITL)?": {
-      "main": [
-        [
-          {
-            "node": "HITL: Pausar hasta Aprobación Humana (Wait)",
+            "node": "HITL: Esperar Decisión Humana (Wait)1",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "7. Airtable: Guardar Solicitud y Estado",
+            "node": "7. Airtable: Guardar Solicitud y Estado1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "HITL: Pausar hasta Aprobación Humana (Wait)": {
+    "HITL: Esperar Decisión Humana (Wait)1": {
       "main": [
         [
           {
-            "node": "7. Airtable: Guardar Solicitud y Estado",
+            "node": "7. Airtable: Guardar Solicitud y Estado1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "7. Airtable: Guardar Solicitud y Estado": {
+    "7. Airtable: Guardar Solicitud y Estado1": {
       "main": [
         [
           {
-            "node": "8. Gmail: Enviar Cotización al Cliente",
+            "node": "8. Gmail: Enviar Cotización al Cliente1",
             "type": "main",
             "index": 0
           }
@@ -345,7 +643,17 @@
       ]
     }
   },
+  "active": false,
   "settings": {
-    "executionOrder": "v1"
-  }
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "bc3c7e8d-6ee7-4ba9-b525-69ee0e37db53",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "474c5dc6ad439ca9a3b8a37509aea557b84565d51d356bf7a5d930f175275fb0"
+  },
+  "nodeGroups": [],
+  "id": "3Tkyhfq4gJs3DicL",
+  "tags": []
 }
