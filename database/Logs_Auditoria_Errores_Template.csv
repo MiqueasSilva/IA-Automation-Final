@@ -1,0 +1,4 @@
+ID_Log,Fecha_Timestamp,ID_Solicitud,Tipo_Error,Severidad,Detalle_Tecnico,Estado_Resolucion,Notificado_Admin
+LOG-2026-001,2026-11-09T15:20:01Z,COT-2026-005,VALIDATION_ERROR,Media,"Faltan campos obligatorios: email_cliente vacío y equipo_industrial no especificado. Payload: {'nombre_cliente': 'Anónimo Test', 'mensaje_requerimiento': 'Error por datos faltantes'}",Registrado en Auditoría,true
+LOG-2026-002,2026-11-09T16:05:22Z,COT-2026-006,AI_API_TIMEOUT,Alta,"Error 504 Gateway Timeout en OpenAI endpoint tras 30s. Trigger de contingencia ejecutado sin interrumpir cola.",Reintento Exitoso (Worker 2),true
+LOG-2026-003,2026-11-09T16:45:10Z,COT-2026-007,BAD_DATA_TYPE,Baja,"El campo urgencia_dias contenía string 'urgente' en vez de valor numérico. Sanitizado a valor por defecto (15).",Resuelto Automáticamente,false

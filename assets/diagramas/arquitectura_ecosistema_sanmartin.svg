@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="100%" height="100%">
+  <defs>
+    <style>
+      .title { font-family: 'Segoe UI', Inter, sans-serif; font-size: 24px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-family: 'Segoe UI', Inter, sans-serif; font-size: 13px; font-weight: 500; fill: #64748b; }
+      .badge-text { font-family: 'Segoe UI', Inter, sans-serif; font-size: 11px; font-weight: 700; fill: #ffffff; }
+      .box-title { font-family: 'Segoe UI', Inter, sans-serif; font-size: 15px; font-weight: 700; }
+      .box-desc { font-family: 'Segoe UI', Inter, sans-serif; font-size: 11px; fill: #475569; }
+      .tag { font-family: 'Segoe UI', Inter, sans-serif; font-size: 10px; font-weight: 600; fill: #2563eb; }
+      .arrow-text { font-family: 'Segoe UI', Inter, sans-serif; font-size: 10px; font-weight: 600; fill: #64748b; }
+    </style>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#10b981"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="680" fill="#f8fafc" rx="16"/>
+
+  <!-- Header Banner -->
+  <rect x="30" y="25" width="1140" height="70" rx="12" fill="#ffffff" filter="url(#shadow)"/>
+  <rect x="30" y="25" width="8" height="70" rx="4" fill="url(#headerGrad)"/>
+  <text x="55" y="55" class="title">Ecosistema Autónomo de Cotizaciones Industriales y Triaje IA</text>
+  <text x="55" y="78" class="subtitle">Empresa Sanmartín S.A. | Arquitectura Técnica End-to-End: n8n + Airtable + OpenAI + HITL + Multicanal</text>
+  <rect x="1010" y="42" width="140" height="32" rx="6" fill="#1e3a8a"/>
+  <text x="1080" y="62" class="badge-text" text-anchor="middle">PRODUCCIÓN v2.4</text>
+
+  <!-- COLUMN 1: INGESTION & DATA QUALITY -->
+  <g transform="translate(40, 120)">
+    <!-- Trigger Card -->
+    <rect width="200" height="130" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="200" height="6" fill="#3b82f6" rx="3"/>
+    <text x="15" y="30" class="box-title" fill="#1e3a8a">1. Ingesta Inteligente</text>
+    <text x="15" y="48" class="tag">TRIGGER / WEBHOOK</text>
+    <text x="15" y="70" class="box-desc">• Recepción Webhook / Form</text>
+    <text x="15" y="88" class="box-desc">• Timestamping automático</text>
+    <text x="15" y="106" class="box-desc">• Previene polling masivo</text>
+
+    <!-- Data Quality Card -->
+    <rect y="160" width="200" height="150" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect x="0" y="160" width="200" height="6" fill="#0284c7" rx="3"/>
+    <text x="15" y="190" class="box-title" fill="#0369a1">2. Calidad de Datos</text>
+    <text x="15" y="208" class="tag">VALIDACIÓN &amp; TIPOS</text>
+    <text x="15" y="230" class="box-desc">• Regex estricto de Email</text>
+    <text x="15" y="248" class="box-desc">• Chequeo de campos críticos</text>
+    <text x="15" y="266" class="box-desc">• Casting numérico explícito</text>
+    <text x="15" y="284" class="box-desc">• Separación Camino Feliz/Infeliz</text>
+
+    <!-- PII Governance Card -->
+    <rect y="340" width="200" height="140" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect x="0" y="340" width="200" height="6" fill="#6366f1" rx="3"/>
+    <text x="15" y="370" class="box-title" fill="#4338ca">3. Gobernanza PII</text>
+    <text x="15" y="388" class="tag">PRIVACIDAD INDUSTRIAL</text>
+    <text x="15" y="410" class="box-desc">• Desacoplamiento de PII</text>
+    <text x="15" y="428" class="box-desc">• Token temporal CLI-SAN-XXXX</text>
+    <text x="15" y="446" class="box-desc">• Bóveda de memoria n8n</text>
+    <text x="15" y="464" class="box-desc">• Payload limpio para LLM</text>
+  </g>
+
+  <!-- COLUMN 2: REASONING ENGINE (IA) & CONTEXT -->
+  <g transform="translate(280, 120)">
+    <!-- Database Memory Card (Airtable) -->
+    <rect width="230" height="130" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="230" height="6" fill="#f59e0b" rx="3"/>
+    <text x="15" y="30" class="box-title" fill="#b45309">4. El "Cerebro" (DB)</text>
+    <text x="15" y="48" class="tag" fill="#d97706">AIRTABLE RELACIONAL</text>
+    <text x="15" y="70" class="box-desc">• Tabla Catálogo de Repuestos</text>
+    <text x="15" y="88" class="box-desc">• Tabla Solicitudes y Estados</text>
+    <text x="15" y="106" class="box-desc">• Relación Linked Records N:1</text>
+
+    <!-- AI Reasoning Engine (LLM) -->
+    <rect y="170" width="230" height="210" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="170" width="230" height="6" fill="#2563eb" rx="3"/>
+    <text x="15" y="200" class="box-title" fill="#1d4ed8">5. Motor de Razonamiento</text>
+    <text x="15" y="218" class="tag">GPT-4o-MINI / CLAUDE</text>
+    <text x="15" y="240" class="box-desc">• Prompt estructurado (Few-Shot)</text>
+    <text x="15" y="258" class="box-desc">• Salida JSON Schema garantizada</text>
+    <text x="15" y="276" class="box-desc">• Tasación técnica y costos USD</text>
+    <text x="15" y="294" class="box-desc">• Lead Scoring (0 - 100) y VIP</text>
+    <text x="15" y="312" class="box-desc">• Regla de evaluación de riesgo</text>
+    <text x="15" y="330" class="box-desc">• Limite: maxTokens: 800, temp: 0.1</text>
+    <text x="15" y="348" class="box-desc">• Redacción borrador propuesta</text>
+
+    <!-- PII Reassembly -->
+    <rect y="410" width="230" height="110" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect x="0" y="410" width="230" height="6" fill="#10b981" rx="3"/>
+    <text x="15" y="440" class="box-title" fill="#047857">6. Re-asociación PII</text>
+    <text x="15" y="458" class="tag" fill="#059669">FUSIÓN DETERMINISTA</text>
+    <text x="15" y="480" class="box-desc">• Re-vinculación Token - Cliente</text>
+    <text x="15" y="498" class="box-desc">• Inyección en Base de Datos</text>
+  </g>
+
+  <!-- COLUMN 3: DECISION BIFURCATION & HITL -->
+  <g transform="translate(550, 120)">
+    <!-- Decision Gate -->
+    <rect width="260" height="140" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="260" height="6" fill="#8b5cf6" rx="3"/>
+    <text x="15" y="30" class="box-title" fill="#6d28d9">7. Bifurcación de Riesgo</text>
+    <text x="15" y="48" class="tag" fill="#7c3aed">ROUTER / IF DETERMINISTA</text>
+    <text x="15" y="70" class="box-desc">• ¿Monto > $3,000 USD?</text>
+    <text x="15" y="88" class="box-desc">• ¿Complejidad == 'Alta'?</text>
+    <text x="15" y="106" class="box-desc">• ¿Lead Categoría == 'VIP'?</text>
+    <text x="15" y="124" class="box-desc">• Si NO -> Auto-Aprobación Directa</text>
+
+    <!-- HITL Workflow Pause -->
+    <rect y="170" width="260" height="190" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="170" width="260" height="6" fill="#d97706" rx="3"/>
+    <text x="15" y="200" class="box-title" fill="#92400e">8. Human-in-the-Loop (HITL)</text>
+    <text x="15" y="218" class="tag" fill="#b45309">CONTROL DE ACCIÓN CRÍTICA</text>
+    <text x="15" y="240" class="box-desc">• Pausa en nodo Wait (Webhook)</text>
+    <text x="15" y="258" class="box-desc">• Alerta a Slack #aprobaciones</text>
+    <text x="15" y="276" class="box-desc">• Botones: [✅ APROBAR] [❌ RECHAZAR]</text>
+    <text x="15" y="294" class="box-desc">• Evita el "Efecto Metralleta"</text>
+    <text x="15" y="312" class="box-desc">• Airtable: "En Espera HITL"</text>
+    <text x="15" y="330" class="box-desc">• Despierta reactivamente sin polling</text>
+  </g>
+
+  <!-- COLUMN 4: MULTI-CHANNEL OUTPUT & OBSERVABILITY -->
+  <g transform="translate(850, 120)">
+    <!-- Multi-channel Output -->
+    <rect width="290" height="230" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="290" height="6" fill="#10b981" rx="3"/>
+    <text x="15" y="30" class="box-title" fill="#047857">9. Salida Multicanal ("La Voz")</text>
+    <text x="15" y="48" class="tag" fill="#059669">GMAIL + SLACK NOTIFIER</text>
+    <text x="15" y="74" class="box-desc">• 📧 Gmail al Cliente Final:</text>
+    <text x="30" y="92" class="box-desc">- Propuesta comercial HTML elegante</text>
+    <text x="30" y="110" class="box-desc">- Desglose de piezas y mano de obra</text>
+    <text x="30" y="128" class="box-desc">- Mapeo de Thread ID / Reply-To</text>
+    <text x="15" y="152" class="box-desc">• 💬 Slack al Equipo de Ventas:</text>
+    <text x="30" y="170" class="box-desc">- Aviso en #cotizaciones-emitidas</text>
+    <text x="15" y="194" class="box-desc">• 📊 Cierre en Airtable:</text>
+    <text x="30" y="212" class="box-desc">- Estado: "Completado - Enviado"</text>
+
+    <!-- Error Handling & Resilience -->
+    <rect y="260" width="290" height="210" rx="10" fill="#fff1f2" stroke="#f43f5e" stroke-width="2" filter="url(#shadow)"/>
+    <rect x="0" y="260" width="290" height="6" fill="#e11d48" rx="3"/>
+    <text x="15" y="290" class="box-title" fill="#9f1239">10. Resiliencia &amp; Error Handling</text>
+    <text x="15" y="308" class="tag" fill="#be123c">SEGURIDAD Y AUDITORÍA</text>
+    <text x="15" y="330" class="box-desc">• Captura de Excepciones (Try-Catch)</text>
+    <text x="15" y="348" class="box-desc">• Directiva continueErrorOutput</text>
+    <text x="15" y="366" class="box-desc">• Registro en Logs_Auditoria_Errores</text>
+    <text x="15" y="384" class="box-desc">• Alerta a Slack #alertas-operaciones</text>
+    <text x="15" y="402" class="box-desc">• Sin loops: No reintenta infinitamente</text>
+    <text x="15" y="420" class="box-desc">• Manejo seguro de cuota y timeouts</text>
+  </g>
+
+  <!-- Connective Arrows -->
+  <line x1="240" y1="230" x2="280" y2="230" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="140" y1="310" x2="140" y2="340" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="510" y1="270" x2="550" y2="190" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="680" y1="140" x2="680" y2="170" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M 810 70 L 850 70" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <path d="M 810 260 L 850 150" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <path d="M 240" y1="270" L 850 360" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#arrow-red)"/>
+
+  <!-- Footer Banner -->
+  <text x="40" y="660" class="arrow-text">Arquitectura aprobada para entrega final Coderhouse IA Automation | Estándar de producción sin datos hardcodeados | Resiliencia Nivel 4</text>
+</svg>

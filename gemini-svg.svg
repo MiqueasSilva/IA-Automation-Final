@@ -1,0 +1,228 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" width="100%" height="100%">
+  <defs>
+    <!-- Paleta de fondos y gradientes -->
+    <linearGradient id="canvasBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0f1d"/>
+      <stop offset="100%" stop-color="#070a14"/>
+    </linearGradient>
+
+    <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#161f36"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+
+    <!-- Gradientes de acento de módulos -->
+    <linearGradient id="sheetsAccent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <linearGradient id="geminiAccent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+
+    <linearGradient id="routerAccent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+
+    <linearGradient id="altaAccent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+
+    <linearGradient id="bajaAccent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+
+    <linearGradient id="retryAccent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+
+    <!-- Filtros de sombra y resplandor -->
+    <filter id="cardShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+
+    <filter id="glowGemini" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#6366f1" flood-opacity="0.4"/>
+    </filter>
+
+    <!-- Marcadores de flechas -->
+    <marker id="arrowDefault" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#ef4444"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#3b82f6"/>
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#f59e0b"/>
+    </marker>
+  </defs>
+
+  <style>
+    .title-main { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 20px; font-weight: 700; fill: #f8fafc; letter-spacing: -0.02em; }
+    .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; font-weight: 500; fill: #94a3b8; }
+    .node-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14.5px; font-weight: 700; fill: #f1f5f9; }
+    .node-subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; font-weight: 500; fill: #94a3b8; }
+    .badge-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .filter-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 10.5px; font-weight: 700; }
+  </style>
+
+  <!-- Fondo General -->
+  <rect width="1100" height="520" rx="16" fill="url(#canvasBg)"/>
+
+  <!-- Encabezado de la Arquitectura -->
+  <g transform="translate(60, 48)">
+    <text class="title-main" x="0" y="0">ARQUITECTURA DE TRIAJE OPERATIVO DE LEADS CON IA</text>
+    <text class="subtitle" x="0" y="24">Escenario Make.com: Clasificación Semántica, Control de Flujo y Resiliencia Activa</text>
+  </g>
+
+  <!-- ==================== CONEXIONES / LÍNEAS DE FLUJO ==================== -->
+  
+  <!-- Sheets -> Gemini -->
+  <path d="M 235 210 L 325 210" stroke="#475569" stroke-width="2.5" fill="none" stroke-linecap="round" marker-end="url(#arrowDefault)"/>
+  
+  <!-- Gemini -> Router -->
+  <path d="M 525 210 L 610 210" stroke="#475569" stroke-width="2.5" fill="none" stroke-linecap="round" marker-end="url(#arrowDefault)"/>
+
+  <!-- Router -> Rama Alta (Gmail Urgente) -->
+  <path d="M 720 185 C 765 185, 785 130, 835 130" stroke="#ef4444" stroke-width="2.5" fill="none" stroke-linecap="round" marker-end="url(#arrowRed)"/>
+
+  <!-- Router -> Rama Baja (Gmail Confirmación) -->
+  <path d="M 720 235 C 765 235, 785 290, 835 290" stroke="#3b82f6" stroke-width="2.5" fill="none" stroke-linecap="round" marker-end="url(#arrowBlue)"/>
+
+  <!-- Gemini -> Error Handler (Retry) -->
+  <path d="M 425 270 L 425 365" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="5 5" fill="none" stroke-linecap="round" marker-end="url(#arrowAmber)"/>
+
+  <!-- ==================== FILTROS EN LÍNEAS ==================== -->
+  <!-- Badge Filtro ALTA -->
+  <g transform="translate(740, 115)">
+    <rect x="0" y="0" width="84" height="22" rx="11" fill="#1e131d" stroke="#ef4444" stroke-width="1.2"/>
+    <text class="filter-label" x="42" y="15" fill="#f87171" text-anchor="middle">Filtro: ALTA</text>
+  </g>
+
+  <!-- Badge Filtro BAJA -->
+  <g transform="translate(740, 278)">
+    <rect x="0" y="0" width="84" height="22" rx="11" fill="#0f1d38" stroke="#3b82f6" stroke-width="1.2"/>
+    <text class="filter-label" x="42" y="15" fill="#60a5fa" text-anchor="middle">Filtro: BAJA</text>
+  </g>
+
+  <!-- ==================== MÓDULOS (NODOS) ==================== -->
+
+  <!-- NODO 1: Google Sheets (Trigger) -->
+  <g transform="translate(60, 150)" filter="url(#cardShadow)">
+    <rect width="175" height="120" rx="14" fill="url(#cardGrad)" stroke="#1e293b" stroke-width="1.5"/>
+    <rect width="175" height="4" rx="2" fill="url(#sheetsAccent)"/>
+    
+    <!-- Ícono Sheets -->
+    <rect x="18" y="24" width="36" height="36" rx="8" fill="#064e3b" stroke="#10b981" stroke-width="1"/>
+    <path d="M 28 34 L 44 34 M 28 42 L 44 42 M 34 30 L 34 50" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Badge Rol -->
+    <rect x="110" y="26" width="48" height="18" rx="9" fill="#064e3b"/>
+    <text class="badge-text" x="134" y="38" fill="#6ee7b7" text-anchor="middle">TRIGGER</text>
+
+    <!-- Textos -->
+    <text class="node-title" x="18" y="84">Google Sheets</text>
+    <text class="node-subtitle" x="18" y="102">Watch New Rows</text>
+  </g>
+
+  <!-- NODO 2: Google Gemini AI -->
+  <g transform="translate(325, 150)" filter="url(#glowGemini)">
+    <rect width="200" height="120" rx="14" fill="url(#cardGrad)" stroke="#4338ca" stroke-width="1.8"/>
+    <rect width="200" height="4" rx="2" fill="url(#geminiAccent)"/>
+    
+    <!-- Ícono Gemini (Estrella IA) -->
+    <rect x="18" y="24" width="36" height="36" rx="8" fill="#1e1b4b" stroke="#818cf8" stroke-width="1"/>
+    <path d="M 36 29 C 36 34 41 39 41 39 C 41 39 36 44 36 49 C 36 44 31 39 31 39 C 31 39 36 34 36 29 Z" fill="#a5b4fc"/>
+
+    <!-- Badge Rol -->
+    <rect x="135" y="26" width="48" height="18" rx="9" fill="#2e1065"/>
+    <text class="badge-text" x="159" y="38" fill="#c084fc" text-anchor="middle">CORE IA</text>
+
+    <!-- Textos -->
+    <text class="node-title" x="18" y="84">Google Gemini AI</text>
+    <text class="node-subtitle" x="18" y="102">Generate a response</text>
+  </g>
+
+  <!-- NODO 3: Router -->
+  <g transform="translate(610, 155)" filter="url(#cardShadow)">
+    <rect width="110" height="110" rx="14" fill="url(#cardGrad)" stroke="#1e293b" stroke-width="1.5"/>
+    <rect width="110" height="4" rx="2" fill="url(#routerAccent)"/>
+    
+    <!-- Ícono Router (Bifurcación) -->
+    <circle cx="55" cy="50" r="18" fill="#2e1065" stroke="#a855f7" stroke-width="1"/>
+    <path d="M 47 50 L 63 50 M 57 44 L 63 50 L 57 56" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <text class="node-title" x="55" y="90" text-anchor="middle">Router</text>
+    <text class="node-subtitle" x="55" y="104" text-anchor="middle">Flow Control</text>
+  </g>
+
+  <!-- NODO 4A: Gmail Prioridad Alta -->
+  <g transform="translate(845, 70)" filter="url(#cardShadow)">
+    <rect width="195" height="115" rx="14" fill="url(#cardGrad)" stroke="#7f1d1d" stroke-width="1.5"/>
+    <rect width="195" height="4" rx="2" fill="url(#altaAccent)"/>
+    
+    <!-- Ícono Gmail -->
+    <rect x="18" y="22" width="34" height="34" rx="8" fill="#450a0a" stroke="#ef4444" stroke-width="1"/>
+    <path d="M 26 31 L 35 38 L 44 31 M 26 31 L 26 46 L 44 46 L 44 31" stroke="#fca5a5" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Badge Prioridad -->
+    <rect x="115" y="24" width="62" height="18" rx="9" fill="#450a0a"/>
+    <text class="badge-text" x="146" y="36" fill="#f87171" text-anchor="middle">URGENTE</text>
+
+    <!-- Textos -->
+    <text class="node-title" x="18" y="78">Gmail (Alerta)</text>
+    <text class="node-subtitle" x="18" y="96">Lead Prioridad Alta</text>
+  </g>
+
+  <!-- NODO 4B: Gmail Prioridad Baja -->
+  <g transform="translate(845, 235)" filter="url(#cardShadow)">
+    <rect width="195" height="115" rx="14" fill="url(#cardGrad)" stroke="#1e3a8a" stroke-width="1.5"/>
+    <rect width="195" height="4" rx="2" fill="url(#bajaAccent)"/>
+    
+    <!-- Ícono Gmail -->
+    <rect x="18" y="22" width="34" height="34" rx="8" fill="#172554" stroke="#3b82f6" stroke-width="1"/>
+    <path d="M 26 31 L 35 38 L 44 31 M 26 31 L 26 46 L 44 46 L 44 31" stroke="#93c5fd" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Badge Prioridad -->
+    <rect x="110" y="24" width="68" height="18" rx="9" fill="#172554"/>
+    <text class="badge-text" x="144" y="36" fill="#60a5fa" text-anchor="middle">ESTÁNDAR</text>
+
+    <!-- Textos -->
+    <text class="node-title" x="18" y="78">Gmail (Acuse)</text>
+    <text class="node-subtitle" x="18" y="96">Lead Prioridad Baja</text>
+  </g>
+
+  <!-- NODO 5: Error Handler (Retry / Resiliencia) -->
+  <g transform="translate(330, 365)" filter="url(#cardShadow)">
+    <rect width="190" height="95" rx="12" fill="#131a2c" stroke="#d97706" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <rect width="190" height="4" rx="2" fill="url(#retryAccent)"/>
+
+    <!-- Ícono Pausa / Retry -->
+    <circle cx="36" cy="40" r="15" fill="#451a03" stroke="#f59e0b" stroke-width="1"/>
+    <path d="M 32 34 L 32 46 M 40 34 L 40 46" stroke="#fcd34d" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Badge Handler -->
+    <rect x="100" y="22" width="75" height="18" rx="9" fill="#451a03"/>
+    <text class="badge-text" x="137" y="34" fill="#fbbf24" text-anchor="middle">RESILIENCIA</text>
+
+    <!-- Textos -->
+    <text class="node-title" x="60" y="66" fill="#fde68a">Retry Directive</text>
+    <text class="node-subtitle" x="60" y="82" fill="#d97706">3 intentos automáticos</text>
+  </g>
+
+  <!-- Pie de página técnico -->
+  <g transform="translate(60, 485)">
+    <circle cx="6" cy="-4" r="3" fill="#10b981"/>
+    <text class="node-subtitle" x="16" y="0" fill="#64748b">Store Incomplete Executions: ACTIVO • Mapeo de variables dinámicas posicionales • Fallback tolerante a fallos</text>
+  </g>
+</svg>
