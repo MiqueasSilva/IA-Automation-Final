@@ -133,9 +133,9 @@ IA Automation/
 
 ## 🎥 9. Video Demostrativo
 
-Demostración en video del flujo en funcionamiento en vivo (Trigger, procesamiento con IA, bifurcación HITL y envío de cotización):
+Demostración en video del flujo en funcionamiento en vivo (Trigger, procesamiento con IA local sobre GPU, control HITL y envío de cotización):
 
-> 📹 **Video Demo:** [Ver Video en Loom / Drive](https://drive.google.com/your-video-link-here)
+> 📹 **Video de Demostración:** [Ver Video Demostrativo (Ia-Automation-COtizaciones.mp4)](Ia-Automation-COtizaciones.mp4)
 
 ---
 
